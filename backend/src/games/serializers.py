@@ -1,17 +1,21 @@
 from rest_framework import serializers
 
-import .models
+from users.serializers import ProfileSerializer
+
+from . import models
 
 
 class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Board
-        fields = ('turn_count', 'fen', 'created_time')
+        fields = ('id', 'turn_count', 'fen', 'created_time')
         read_only_fields = fields
 
 class GameSerializer(serializers.ModelSerializer):
-    board = BoardSerializer(source='board')
+    board = BoardSerializer()
+    white_player = ProfileSerializer()
+    black_player = ProfileSerializer()
 
     class Meta:
         model = models.Game
-        fields = ('white_player', 'black_player', 'created_time', 'last_updated_time')
+        fields = ('id', 'white_player', 'black_player', 'board', 'created_time', 'last_updated_time')

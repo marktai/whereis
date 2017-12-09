@@ -32,5 +32,5 @@ backup_db:
 
 install_package:
 	docker-compose exec backend pip3 install $(pkg)
-	docker-compose exec backend pip3 freeze | tail -n +2 > backend/requirements.txt
+	docker-compose exec backend pip3 freeze | tail -n +1 > backend/requirements.txt
 

@@ -32,15 +32,15 @@ class OwnGameViewSet(viewsets.ModelViewSet):
     serializer_class = GameSerializer
 
     def get_queryset(self):
-        return self.request.user.games
+        return self.request.user.profile.games
 
 
 class MakeMoveView(APIView):
-    def post(self, request):
-        game = get_object_or_404(Game, self.kwargs['game_id'])
+    def post(self, request, *args, **kwargs):
+        game = get_object_or_404(Game, id=kwargs['game_id'])
         game.make_move(request.user.profile, request.data['uci'])
 
-        return GameSerializer(game)
+        return Response(GameSerializer(game).data)
 
 
 

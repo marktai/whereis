@@ -862,6 +862,11 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 4	2017-12-09 11:29:24.257844+00	3	test2@marktai.com	2	[{"changed": {"fields": ["first_name", "email"]}}]	4	1
 5	2017-12-09 11:29:34.763887+00	1	test@marktai.com	1	[{"added": {}}]	8	1
 6	2017-12-09 11:29:39.741472+00	2	test2@marktai.com	1	[{"added": {}}]	8	1
+7	2017-12-09 11:30:32.168813+00	1	Game object (1)	1	[{"added": {}}]	14	1
+8	2017-12-09 11:37:58.710417+00	1	Game between test@marktai.com and test2@marktai.com	3		14	1
+9	2017-12-09 11:38:03.650623+00	2	Game between test@marktai.com and test2@marktai.com	1	[{"added": {}}]	14	1
+10	2017-12-09 11:47:53.87523+00	12	Game between test@marktai.com and test2@marktai.com	1	[{"added": {}}]	14	1
+11	2017-12-09 11:53:45.672173+00	1	badchess web access	1	[{"added": {}}]	7	1
 \.
 
 
@@ -930,6 +935,9 @@ r2dsz9sswp56byafhchkbxtwd35l59iv	NzlhN2Q4M2VjMjkyNTlmYzZhZWMxYWY3OGI2MmUwNjM1ZDE
 --
 
 COPY games_board (id, turn_count, fen, created_time, game_id) FROM stdin;
+2	0	rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w AHah - 0 1	2017-12-09 11:47:53.873686+00	12
+4	1	rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b HAha - 0 1	2017-12-09 12:18:24.736926+00	12
+5	2	rnbqkbnr/1ppppppp/p7/8/8/P7/1PPPPPPP/RNBQKBNR w HAha - 0 2	2017-12-09 12:20:03.002388+00	12
 \.
 
 
@@ -938,6 +946,7 @@ COPY games_board (id, turn_count, fen, created_time, game_id) FROM stdin;
 --
 
 COPY games_game (id, created_time, last_updated_time, black_player_id, white_player_id) FROM stdin;
+12	2017-12-09 11:47:53.872221+00	2017-12-09 11:47:53.872237+00	2	1
 \.
 
 
@@ -946,6 +955,9 @@ COPY games_game (id, created_time, last_updated_time, black_player_id, white_pla
 --
 
 COPY oauth2_provider_accesstoken (id, token, expires, scope, application_id, user_id, created, updated) FROM stdin;
+1	3asOe6QQ6q47Zp9MCVUycjwYQyZk0Z	2017-12-09 21:53:57.151323+00	read write groups	1	1	2017-12-09 11:53:57.151611+00	2017-12-09 11:53:57.15162+00
+2	hvqIiRWJx9qzv7iAg8nL7xEVwnlvOt	2017-12-09 21:54:23.674589+00	read write groups	1	2	2017-12-09 11:54:23.674815+00	2017-12-09 11:54:23.674828+00
+3	MLOTiI3eCtN50xyu6mE1DimeCxCv6J	2017-12-09 22:19:50.647635+00	read write groups	1	3	2017-12-09 12:19:50.647971+00	2017-12-09 12:19:50.647981+00
 \.
 
 
@@ -954,6 +966,7 @@ COPY oauth2_provider_accesstoken (id, token, expires, scope, application_id, use
 --
 
 COPY oauth2_provider_application (id, client_id, redirect_uris, client_type, authorization_grant_type, client_secret, name, user_id, skip_authorization, created, updated) FROM stdin;
+1	web		public	password	SC8ZkC4G4L2tgDmXnffsvfTFsoZGaIaUx0QhgwAMlnKszDwHny1Gt944VilmxvE1U3bnlBNI5qX242DZ2UXet8oniUmjUEXAshpLldULaJ78Lw3YMt0XBmUIUNI3adyt	badchess web access	\N	f	2017-12-09 11:53:45.671613+00	2017-12-09 11:53:45.671628+00
 \.
 
 
@@ -970,6 +983,9 @@ COPY oauth2_provider_grant (id, code, expires, redirect_uri, scope, application_
 --
 
 COPY oauth2_provider_refreshtoken (id, token, access_token_id, application_id, user_id, created, updated) FROM stdin;
+1	HN4pnYXORi7OYHfFAwEz423MKZoYjj	1	1	1	2017-12-09 11:53:57.152541+00	2017-12-09 11:53:57.152552+00
+2	9lbxRKp0MEeW1nTyCKOxtULEFZEj9M	2	1	2	2017-12-09 11:54:23.675507+00	2017-12-09 11:54:23.675517+00
+3	WbY6S4qaQLuK3mq3uHhvXT8kYMfa9R	3	1	3	2017-12-09 12:19:50.648912+00	2017-12-09 12:19:50.648924+00
 \.
 
 
@@ -1029,7 +1045,7 @@ SELECT pg_catalog.setval('auth_user_user_permissions_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 6, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 11, true);
 
 
 --
@@ -1050,28 +1066,28 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 21, true);
 -- Name: games_board_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('games_board_id_seq', 1, false);
+SELECT pg_catalog.setval('games_board_id_seq', 5, true);
 
 
 --
 -- Name: games_game_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('games_game_id_seq', 1, false);
+SELECT pg_catalog.setval('games_game_id_seq', 12, true);
 
 
 --
 -- Name: oauth2_provider_accesstoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', 1, false);
+SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', 3, true);
 
 
 --
 -- Name: oauth2_provider_application_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_application_id_seq', 1, false);
+SELECT pg_catalog.setval('oauth2_provider_application_id_seq', 1, true);
 
 
 --
@@ -1085,7 +1101,7 @@ SELECT pg_catalog.setval('oauth2_provider_grant_id_seq', 1, false);
 -- Name: oauth2_provider_refreshtoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', 1, false);
+SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', 3, true);
 
 
 --

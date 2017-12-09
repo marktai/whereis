@@ -23,8 +23,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
 
-        fields = ('id', 'first_name', 'last_name', 'email', 'year', 'verified', 'picture')
-        read_only_fields = ('id', 'verified')
+        fields = ('id', 'first_name', 'last_name', 'email')
+        read_only_fields = ('id',)
 
     def update(self, instance, validated_data):
         if 'user' in validated_data:

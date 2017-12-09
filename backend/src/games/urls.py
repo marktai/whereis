@@ -5,12 +5,10 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register(r'me/games', views.OwnGameViewSet)
+router.register(r'me/games', views.OwnGameViewSet, base_name='game_query_set')
 
 app_name = 'games'
 urlpatterns = [
     url(r'^', include(router.urls)),
-    url(r'^games/<int:game_id>/move/?$', views.MakeMoveView.as_view(), name='make_move'),
-    url(r'^users/?$', views.CreateUser.as_view(), name='create'),
-    url(r'^verify/?$', views.VerifyUser.as_view(), name='verify'),
+    url(r'^games/(?P<game_id>[0-9]+)/move/?$', views.MakeMoveView.as_view(), name='make_move'),
 ]
