@@ -20,10 +20,11 @@ test:
 	docker-compose exec backend /app/src/manage.py test --no-input --parallel $(args)
 
 clean_db:
-	echo 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' | docker-compose exec db psql -U postgres
+	docker-compose exec db psql -U postgres -c 'DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;'
 
 init_db: clean_db 
-	cat ./backend/init_db.sql | docker-compose exec db psql -U postgres
+	docker cp backend/init_db.sql "$(shell docker-compose ps -q db)":/init_db.sql
+	docker-compose exec db psql -U postgres -f /init_db.sql 
 	docker-compose exec backend /app/src/manage.py migrate
 
 backup_db:
@@ -31,5 +32,5 @@ backup_db:
 
 install_package:
 	docker-compose exec backend pip3 install $(pkg)
-	docker-compose exec backend pip3 freeze | tail -n +2 > requirements.txt
+	docker-compose exec backend pip3 freeze | tail -n +2 > backend/requirements.txt
 

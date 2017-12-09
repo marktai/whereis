@@ -50,8 +50,8 @@ SET default_transaction_read_only = off;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.0
--- Dumped by pg_dump version 10.0
+-- Dumped from database version 10.1
+-- Dumped by pg_dump version 10.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -205,7 +205,7 @@ CREATE TABLE auth_user (
     is_superuser boolean NOT NULL,
     username character varying(150) NOT NULL,
     first_name character varying(30) NOT NULL,
-    last_name character varying(30) NOT NULL,
+    last_name character varying(150) NOT NULL,
     email character varying(254) NOT NULL,
     is_staff boolean NOT NULL,
     is_active boolean NOT NULL,
@@ -305,40 +305,6 @@ ALTER TABLE auth_user_user_permissions_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE auth_user_user_permissions_id_seq OWNED BY auth_user_user_permissions.id;
-
-
---
--- Name: corsheaders_corsmodel; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE corsheaders_corsmodel (
-    id integer NOT NULL,
-    cors character varying(255) NOT NULL
-);
-
-
-ALTER TABLE corsheaders_corsmodel OWNER TO postgres;
-
---
--- Name: corsheaders_corsmodel_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE corsheaders_corsmodel_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE corsheaders_corsmodel_id_seq OWNER TO postgres;
-
---
--- Name: corsheaders_corsmodel_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE corsheaders_corsmodel_id_seq OWNED BY corsheaders_corsmodel.id;
 
 
 --
@@ -465,6 +431,80 @@ CREATE TABLE django_session (
 
 
 ALTER TABLE django_session OWNER TO postgres;
+
+--
+-- Name: games_board; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE games_board (
+    id integer NOT NULL,
+    turn_count integer NOT NULL,
+    fen character varying(100) NOT NULL,
+    created_time timestamp with time zone NOT NULL,
+    game_id integer NOT NULL
+);
+
+
+ALTER TABLE games_board OWNER TO postgres;
+
+--
+-- Name: games_board_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE games_board_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE games_board_id_seq OWNER TO postgres;
+
+--
+-- Name: games_board_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE games_board_id_seq OWNED BY games_board.id;
+
+
+--
+-- Name: games_game; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE games_game (
+    id integer NOT NULL,
+    created_time timestamp with time zone NOT NULL,
+    last_updated_time timestamp with time zone NOT NULL,
+    black_player_id integer,
+    white_player_id integer
+);
+
+
+ALTER TABLE games_game OWNER TO postgres;
+
+--
+-- Name: games_game_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE games_game_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE games_game_id_seq OWNER TO postgres;
+
+--
+-- Name: games_game_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE games_game_id_seq OWNED BY games_game.id;
+
 
 --
 -- Name: oauth2_provider_accesstoken_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -598,83 +638,14 @@ CREATE TABLE oauth2_provider_refreshtoken (
 ALTER TABLE oauth2_provider_refreshtoken OWNER TO postgres;
 
 --
--- Name: users_major; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE users_major (
-    id integer NOT NULL,
-    name character varying(100) NOT NULL
-);
-
-
-ALTER TABLE users_major OWNER TO postgres;
-
---
--- Name: users_major_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE users_major_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE users_major_id_seq OWNER TO postgres;
-
---
--- Name: users_major_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE users_major_id_seq OWNED BY users_major.id;
-
-
---
--- Name: users_mentor; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE users_mentor (
-    id integer NOT NULL,
-    bio character varying(5000) NOT NULL,
-    major_id integer,
-    profile_id integer NOT NULL,
-    active boolean NOT NULL
-);
-
-
-ALTER TABLE users_mentor OWNER TO postgres;
-
---
--- Name: users_mentor_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE users_mentor_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE users_mentor_id_seq OWNER TO postgres;
-
---
--- Name: users_mentor_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE users_mentor_id_seq OWNED BY users_mentor.id;
-
-
---
 -- Name: users_profile; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE users_profile (
     id integer NOT NULL,
-    bio character varying(5000) NOT NULL,
+    verified boolean NOT NULL,
+    verification_code character varying(10),
+    picture character varying(100),
     user_id integer NOT NULL
 );
 
@@ -746,13 +717,6 @@ ALTER TABLE ONLY auth_user_user_permissions ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- Name: corsheaders_corsmodel id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY corsheaders_corsmodel ALTER COLUMN id SET DEFAULT nextval('corsheaders_corsmodel_id_seq'::regclass);
-
-
---
 -- Name: django_admin_log id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -774,17 +738,17 @@ ALTER TABLE ONLY django_migrations ALTER COLUMN id SET DEFAULT nextval('django_m
 
 
 --
--- Name: users_major id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: games_board id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY users_major ALTER COLUMN id SET DEFAULT nextval('users_major_id_seq'::regclass);
+ALTER TABLE ONLY games_board ALTER COLUMN id SET DEFAULT nextval('games_board_id_seq'::regclass);
 
 
 --
--- Name: users_mentor id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: games_game id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY users_mentor ALTER COLUMN id SET DEFAULT nextval('users_mentor_id_seq'::regclass);
+ALTER TABLE ONLY games_game ALTER COLUMN id SET DEFAULT nextval('games_game_id_seq'::regclass);
 
 
 --
@@ -833,30 +797,30 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 16	Can add session	6	add_session
 17	Can change session	6	change_session
 18	Can delete session	6	delete_session
-19	Can add major	7	add_major
-20	Can change major	7	change_major
-21	Can delete major	7	delete_major
-22	Can add profile	8	add_profile
-23	Can change profile	8	change_profile
-24	Can delete profile	8	delete_profile
-25	Can add mentor	9	add_mentor
-26	Can change mentor	9	change_mentor
-27	Can delete mentor	9	delete_mentor
-28	Can add application	10	add_application
-29	Can change application	10	change_application
-30	Can delete application	10	delete_application
-31	Can add access token	11	add_accesstoken
-32	Can change access token	11	change_accesstoken
-33	Can delete access token	11	delete_accesstoken
-34	Can add grant	12	add_grant
-35	Can change grant	12	change_grant
-36	Can delete grant	12	delete_grant
-37	Can add refresh token	13	add_refreshtoken
-38	Can change refresh token	13	change_refreshtoken
-39	Can delete refresh token	13	delete_refreshtoken
-40	Can add cors model	14	add_corsmodel
-41	Can change cors model	14	change_corsmodel
-42	Can delete cors model	14	delete_corsmodel
+19	Can add application	7	add_application
+20	Can change application	7	change_application
+21	Can delete application	7	delete_application
+22	Can add access token	8	add_accesstoken
+23	Can change access token	8	change_accesstoken
+24	Can delete access token	8	delete_accesstoken
+25	Can add grant	9	add_grant
+26	Can change grant	9	change_grant
+27	Can delete grant	9	delete_grant
+28	Can add refresh token	10	add_refreshtoken
+29	Can change refresh token	10	change_refreshtoken
+30	Can delete refresh token	10	delete_refreshtoken
+31	Can add cors model	11	add_corsmodel
+32	Can change cors model	11	change_corsmodel
+33	Can delete cors model	11	delete_corsmodel
+34	Can add profile	12	add_profile
+35	Can change profile	12	change_profile
+36	Can delete profile	12	delete_profile
+37	Can add board	13	add_board
+38	Can change board	13	change_board
+39	Can delete board	13	delete_board
+40	Can add game	14	add_game
+41	Can change game	14	change_game
+42	Can delete game	14	delete_game
 \.
 
 
@@ -865,8 +829,9 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$36000$TIguTya1YR2Q$1Qv1eQ0pf+ANE8zGcmKbgMYCbyK8XCIx9FyJvC2sbj8=	2017-11-01 02:37:44.072+00	t	root	mark	tai	mark@marktai.com	t	t	2017-10-25 23:32:49.234+00
-6	pbkdf2_sha256$36000$CLcBM5r1VHc5$O8Abg2na5IPfLfPcDy233Yw9p4zxFI024qbk63HKZjw=	\N	f	test@marktai.com	Test	Test	test@marktai.com	f	t	2017-10-26 04:02:47+00
+1	pbkdf2_sha256$100000$WjHWkAuJXMIH$z8Qj0ZepRjLmyCDJbjONInUDsl1MX00ksrNUXnrj6q8=	2017-12-09 11:28:51.309591+00	t	root			mark@marktai.com	t	t	2017-12-09 11:28:44.392006+00
+2	pbkdf2_sha256$100000$4fNzagCv0MnX$7RuNRmBFcXgYzVu25bcCjzV8RmKWSTtmGJHNd7T+Ny8=	\N	f	test@marktai.com	Test		test@marktai.com	f	t	2017-12-09 11:29:01+00
+3	pbkdf2_sha256$100000$NRAxk9jHZKu7$dHlxBNKZdB9JIqUCkqDx28noqgnuQMw8voQPZtpbhsg=	\N	f	test2@marktai.com	Test2		test2@marktai.com	f	t	2017-12-09 11:29:19+00
 \.
 
 
@@ -887,18 +852,16 @@ COPY auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 
 
 --
--- Data for Name: corsheaders_corsmodel; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY corsheaders_corsmodel (id, cors) FROM stdin;
-\.
-
-
---
 -- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
+1	2017-12-09 11:29:01.414069+00	2	test@marktai.com	1	[{"added": {}}]	4	1
+2	2017-12-09 11:29:10.009685+00	2	test@marktai.com	2	[{"changed": {"fields": ["first_name", "email"]}}]	4	1
+3	2017-12-09 11:29:19.270537+00	3	test2@marktai.com	1	[{"added": {}}]	4	1
+4	2017-12-09 11:29:24.257844+00	3	test2@marktai.com	2	[{"changed": {"fields": ["first_name", "email"]}}]	4	1
+5	2017-12-09 11:29:34.763887+00	1	test@marktai.com	1	[{"added": {}}]	8	1
+6	2017-12-09 11:29:39.741472+00	2	test2@marktai.com	1	[{"added": {}}]	8	1
 \.
 
 
@@ -913,14 +876,14 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 4	auth	user
 5	contenttypes	contenttype
 6	sessions	session
-7	users	major
-8	users	profile
-9	users	mentor
-10	oauth2_provider	application
-11	oauth2_provider	accesstoken
-12	oauth2_provider	grant
-13	oauth2_provider	refreshtoken
-14	corsheaders	corsmodel
+7	oauth2_provider	application
+8	oauth2_provider	accesstoken
+9	oauth2_provider	grant
+10	oauth2_provider	refreshtoken
+11	corsheaders	corsmodel
+12	users	profile
+13	games	board
+14	games	game
 \.
 
 
@@ -929,28 +892,27 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2017-10-25 22:10:17.134972+00
-2	auth	0001_initial	2017-10-25 22:10:17.792263+00
-3	admin	0001_initial	2017-10-25 22:10:18.066933+00
-4	admin	0002_logentry_remove_auto_add	2017-10-25 22:10:18.233448+00
-5	contenttypes	0002_remove_content_type_name	2017-10-25 22:10:18.621833+00
-6	auth	0002_alter_permission_name_max_length	2017-10-25 22:10:18.772225+00
-7	auth	0003_alter_user_email_max_length	2017-10-25 22:10:18.972423+00
-8	auth	0004_alter_user_username_opts	2017-10-25 22:10:19.120617+00
-9	auth	0005_alter_user_last_login_null	2017-10-25 22:10:19.270855+00
-10	auth	0006_require_contenttypes_0002	2017-10-25 22:10:19.273339+00
-11	auth	0007_alter_validators_add_error_messages	2017-10-25 22:10:19.427851+00
-12	auth	0008_alter_user_username_max_length	2017-10-25 22:10:19.601167+00
-13	sessions	0001_initial	2017-10-25 22:10:19.701747+00
-14	users	0001_initial	2017-10-25 23:11:35.355958+00
-15	users	0002_mentor_active	2017-10-25 23:38:06.879303+00
-16	oauth2_provider	0001_initial	2017-10-26 00:08:28.972306+00
-17	oauth2_provider	0002_08_updates	2017-10-26 00:08:29.073066+00
-18	oauth2_provider	0003_auto_20160316_1503	2017-10-26 00:08:29.098027+00
-19	oauth2_provider	0004_auto_20160525_1623	2017-10-26 00:08:29.183548+00
-20	oauth2_provider	0005_auto_20170514_1141	2017-10-26 00:08:29.834376+00
-21	users	0003_auto_20171026_0516	2017-10-26 05:16:42.493777+00
-22	corsheaders	0001_initial	2017-11-01 02:56:22.796205+00
+1	contenttypes	0001_initial	2017-12-09 11:27:49.732312+00
+2	auth	0001_initial	2017-12-09 11:27:49.795486+00
+3	admin	0001_initial	2017-12-09 11:27:49.816508+00
+4	admin	0002_logentry_remove_auto_add	2017-12-09 11:27:49.822863+00
+5	contenttypes	0002_remove_content_type_name	2017-12-09 11:27:49.837922+00
+6	auth	0002_alter_permission_name_max_length	2017-12-09 11:27:49.843021+00
+7	auth	0003_alter_user_email_max_length	2017-12-09 11:27:49.850141+00
+8	auth	0004_alter_user_username_opts	2017-12-09 11:27:49.856055+00
+9	auth	0005_alter_user_last_login_null	2017-12-09 11:27:49.863339+00
+10	auth	0006_require_contenttypes_0002	2017-12-09 11:27:49.864945+00
+11	auth	0007_alter_validators_add_error_messages	2017-12-09 11:27:49.870958+00
+12	auth	0008_alter_user_username_max_length	2017-12-09 11:27:49.884913+00
+13	auth	0009_alter_user_last_name_max_length	2017-12-09 11:27:49.892734+00
+14	users	0001_initial	2017-12-09 11:27:49.906739+00
+15	games	0001_initial	2017-12-09 11:27:49.939269+00
+16	oauth2_provider	0001_initial	2017-12-09 11:27:50.049491+00
+17	oauth2_provider	0002_08_updates	2017-12-09 11:27:50.093443+00
+18	oauth2_provider	0003_auto_20160316_1503	2017-12-09 11:27:50.106699+00
+19	oauth2_provider	0004_auto_20160525_1623	2017-12-09 11:27:50.152234+00
+20	oauth2_provider	0005_auto_20170514_1141	2017-12-09 11:27:50.506482+00
+21	sessions	0001_initial	2017-12-09 11:27:50.522821+00
 \.
 
 
@@ -959,10 +921,23 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 --
 
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
-0stomv2iy38s1c214i83kovwmj80wfjr	Y2IwYWI4ZGQxNjJjNzI2YmJlMmU4ZDI5YmMwMzU5MTUxOWM3YjMyNDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJjODI2NWIxM2Y3NGRlZTdmZWIzNDNmMDBlYmMzYjVmYmM2YjYxZjUzIn0=	2017-11-09 04:27:25.642+00
-76chuz4m0m1jmiasur86p7gxphbiwsh3	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2017-11-15 02:37:44.077+00
-z4iwiuyuz64qj5tzdxacsaya2h8rcbvw	Y2IwYWI4ZGQxNjJjNzI2YmJlMmU4ZDI5YmMwMzU5MTUxOWM3YjMyNDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJjODI2NWIxM2Y3NGRlZTdmZWIzNDNmMDBlYmMzYjVmYmM2YjYxZjUzIn0=	2017-11-09 04:55:50.53+00
-8g73wu8505on5e059fl639e0ei8dkk5r	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2017-11-16 08:00:40.971391+00
+r2dsz9sswp56byafhchkbxtwd35l59iv	NzlhN2Q4M2VjMjkyNTlmYzZhZWMxYWY3OGI2MmUwNjM1ZDE3NDczMTp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiI3Nzg2YTUwNTJjYzU3M2Y1ZmYwODViZjYyOTNhNTVjNDcyMDk4ODVjIn0=	2017-12-23 11:28:51.311432+00
+\.
+
+
+--
+-- Data for Name: games_board; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY games_board (id, turn_count, fen, created_time, game_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: games_game; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY games_game (id, created_time, last_updated_time, black_player_id, white_player_id) FROM stdin;
 \.
 
 
@@ -979,7 +954,6 @@ COPY oauth2_provider_accesstoken (id, token, expires, scope, application_id, use
 --
 
 COPY oauth2_provider_application (id, client_id, redirect_uris, client_type, authorization_grant_type, client_secret, name, user_id, skip_authorization, created, updated) FROM stdin;
-1	web		confidential	password	sMXrq4RV2muu07ERhrllW1uCfH12U4ZNeqyM0L8bmaF9P59prjkIe5mhJJAt47Kod14yhRdg96gEf1m183sblRzyC175eLd7NzsyWS9w6QTyVPdczvTmeHiGBJJPjhGf	badchess web access	\N	f	2017-10-26 00:16:28.897+00	2017-11-02 07:56:52.99572+00
 \.
 
 
@@ -1000,29 +974,12 @@ COPY oauth2_provider_refreshtoken (id, token, access_token_id, application_id, u
 
 
 --
--- Data for Name: users_major; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY users_major (id, name) FROM stdin;
-1	CS
-\.
-
-
---
--- Data for Name: users_mentor; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY users_mentor (id, bio, major_id, profile_id, active) FROM stdin;
-2	I am a mentoring CS person	1	1	t
-\.
-
-
---
 -- Data for Name: users_profile; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY users_profile (id, bio, user_id) FROM stdin;
-1	I am the best test user	6
+COPY users_profile (id, verified, verification_code, picture, user_id) FROM stdin;
+1	t	\N	profile_pictures/default_pic.jpg	2
+2	t	\N	profile_pictures/default_pic.jpg	3
 \.
 
 
@@ -1044,7 +1001,7 @@ SELECT pg_catalog.setval('auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_permission_id_seq', COALESCE((SELECT MAX(id)+1 FROM auth_permission), 1), true);
+SELECT pg_catalog.setval('auth_permission_id_seq', 42, true);
 
 
 --
@@ -1058,7 +1015,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', COALESCE((SELECT MAX(id)+1 FROM auth_user), 1), true);
+SELECT pg_catalog.setval('auth_user_id_seq', 3, true);
 
 
 --
@@ -1069,45 +1026,52 @@ SELECT pg_catalog.setval('auth_user_user_permissions_id_seq', 1, false);
 
 
 --
--- Name: corsheaders_corsmodel_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('corsheaders_corsmodel_id_seq', 1, false);
-
-
---
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', COALESCE((SELECT MAX(id)+1 FROM django_admin_log), 1), true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 6, true);
 
 
 --
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_content_type_id_seq', COALESCE((SELECT MAX(id)+1 FROM django_content_type), 1), true);
+SELECT pg_catalog.setval('django_content_type_id_seq', 14, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_migrations_id_seq', COALESCE((SELECT MAX(id)+1 FROM django_migrations), 1), true);
+SELECT pg_catalog.setval('django_migrations_id_seq', 21, true);
+
+
+--
+-- Name: games_board_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('games_board_id_seq', 1, false);
+
+
+--
+-- Name: games_game_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('games_game_id_seq', 1, false);
 
 
 --
 -- Name: oauth2_provider_accesstoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', COALESCE((SELECT MAX(id)+1 FROM oauth2_provider_accesstoken), 1), true);
+SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', 1, false);
 
 
 --
 -- Name: oauth2_provider_application_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_application_id_seq', 1, true);
+SELECT pg_catalog.setval('oauth2_provider_application_id_seq', 1, false);
 
 
 --
@@ -1121,28 +1085,14 @@ SELECT pg_catalog.setval('oauth2_provider_grant_id_seq', 1, false);
 -- Name: oauth2_provider_refreshtoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', COALESCE((SELECT MAX(id)+1 FROM oauth2_provider_refreshtoken), 1), true);
-
-
---
--- Name: users_major_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('users_major_id_seq', 1, true);
-
-
---
--- Name: users_mentor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('users_mentor_id_seq', 2, true);
+SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', 1, false);
 
 
 --
 -- Name: users_profile_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_profile_id_seq', 1, true);
+SELECT pg_catalog.setval('users_profile_id_seq', 2, true);
 
 
 --
@@ -1242,14 +1192,6 @@ ALTER TABLE ONLY auth_user
 
 
 --
--- Name: corsheaders_corsmodel corsheaders_corsmodel_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY corsheaders_corsmodel
-    ADD CONSTRAINT corsheaders_corsmodel_pkey PRIMARY KEY (id);
-
-
---
 -- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1287,6 +1229,22 @@ ALTER TABLE ONLY django_migrations
 
 ALTER TABLE ONLY django_session
     ADD CONSTRAINT django_session_pkey PRIMARY KEY (session_key);
+
+
+--
+-- Name: games_board games_board_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY games_board
+    ADD CONSTRAINT games_board_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: games_game games_game_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY games_game
+    ADD CONSTRAINT games_game_pkey PRIMARY KEY (id);
 
 
 --
@@ -1359,22 +1317,6 @@ ALTER TABLE ONLY oauth2_provider_refreshtoken
 
 ALTER TABLE ONLY oauth2_provider_refreshtoken
     ADD CONSTRAINT oauth2_provider_refreshtoken_token_d090daa4_uniq UNIQUE (token);
-
-
---
--- Name: users_major users_major_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY users_major
-    ADD CONSTRAINT users_major_pkey PRIMARY KEY (id);
-
-
---
--- Name: users_mentor users_mentor_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY users_mentor
-    ADD CONSTRAINT users_mentor_pkey PRIMARY KEY (id);
 
 
 --
@@ -1485,6 +1427,27 @@ CREATE INDEX django_session_session_key_c0390e0f_like ON django_session USING bt
 
 
 --
+-- Name: games_board_game_id_794f0308; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX games_board_game_id_794f0308 ON games_board USING btree (game_id);
+
+
+--
+-- Name: games_game_black_player_id_410035ac; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX games_game_black_player_id_410035ac ON games_game USING btree (black_player_id);
+
+
+--
+-- Name: games_game_white_player_id_71ad1fd2; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX games_game_white_player_id_71ad1fd2 ON games_game USING btree (white_player_id);
+
+
+--
 -- Name: oauth2_provider_accesstoken_application_id_b22886e1; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1576,20 +1539,6 @@ CREATE INDEX oauth2_provider_refreshtoken_user_id_da837fce ON oauth2_provider_re
 
 
 --
--- Name: users_mentor_major_id_0cd7cb9f; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX users_mentor_major_id_0cd7cb9f ON users_mentor USING btree (major_id);
-
-
---
--- Name: users_mentor_profile_id_494baacd; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX users_mentor_profile_id_494baacd ON users_mentor USING btree (profile_id);
-
-
---
 -- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1654,11 +1603,35 @@ ALTER TABLE ONLY django_admin_log
 
 
 --
--- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: django_admin_log django_admin_log_user_id_c564eba6_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY django_admin_log
-    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: games_board games_board_game_id_794f0308_fk_games_game_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY games_board
+    ADD CONSTRAINT games_board_game_id_794f0308_fk_games_game_id FOREIGN KEY (game_id) REFERENCES games_game(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: games_game games_game_black_player_id_410035ac_fk_users_profile_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY games_game
+    ADD CONSTRAINT games_game_black_player_id_410035ac_fk_users_profile_id FOREIGN KEY (black_player_id) REFERENCES users_profile(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: games_game games_game_white_player_id_71ad1fd2_fk_users_profile_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY games_game
+    ADD CONSTRAINT games_game_white_player_id_71ad1fd2_fk_users_profile_id FOREIGN KEY (white_player_id) REFERENCES users_profile(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -1726,22 +1699,6 @@ ALTER TABLE ONLY oauth2_provider_refreshtoken
 
 
 --
--- Name: users_mentor users_mentor_major_id_0cd7cb9f_fk_users_major_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY users_mentor
-    ADD CONSTRAINT users_mentor_major_id_0cd7cb9f_fk_users_major_id FOREIGN KEY (major_id) REFERENCES users_major(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: users_mentor users_mentor_profile_id_494baacd_fk_users_profile_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY users_mentor
-    ADD CONSTRAINT users_mentor_profile_id_494baacd_fk_users_profile_id FOREIGN KEY (profile_id) REFERENCES users_profile(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: users_profile users_profile_user_id_2112e78d_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1761,8 +1718,8 @@ SET default_transaction_read_only = off;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.0
--- Dumped by pg_dump version 10.0
+-- Dumped from database version 10.1
+-- Dumped by pg_dump version 10.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;

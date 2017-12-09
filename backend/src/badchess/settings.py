@@ -42,8 +42,9 @@ INSTALLED_APPS = (
     'django_extensions',
     'storages',
 
-    # Pick My Bruin Apps
+    # badchess Apps
     'users',
+    'games',
 )
 
 AUTHENTICATION_BACKENDS = (

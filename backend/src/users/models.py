@@ -20,5 +20,10 @@ class Profile(models.Model):
     def generate_verification_code():
         return ''.join(random.choices(string.ascii_uppercase+string.digits, k=Profile.VERIFICATION_CHAR_NUM))
 
+    @property
+    def games(self):
+        from games.models import Game
+        return Game.objects.filter(Q(white_player=self) | Q(black_player=self))
+
     def __str__(self):
         return str(self.user)
