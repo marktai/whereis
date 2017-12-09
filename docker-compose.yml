@@ -1,0 +1,15 @@
+version: '3.3'
+
+services:
+  db:
+    image: postgres:10.1-alpine
+  backend:
+    image: badchess/backend:latest
+    depends_on:
+      - db
+  frontend:
+    image: badchess/frontend:latest
+    ports:
+      - "7000:80"
+    depends_on:
+      - web
