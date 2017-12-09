@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
-from rest_framework import routers
-from users import views as users_views
+from rest_framework import routers, urls as rest_framework_urls
+import users.urls as users_urls
+from oauth2_provider import urls as oauth2_provider_urls
 
 from django.contrib import admin
 admin.autodiscover()
@@ -13,9 +14,8 @@ router = routers.DefaultRouter()
 router.registry.extend(users_router.registry)
 
 urlpatterns = [
-    url(r'^drf/', include(router.urls)),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'', include('users.urls', namespace='users')),
-    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    url(r'^admin/', admin.site.urls),
+    url(r'^api-auth/', include(rest_framework_urls)),
+    url(r'', include(users_urls)),
+    url(r'^o/', include(oauth2_provider_urls)),
 ]

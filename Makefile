@@ -13,33 +13,23 @@ run:
 restart:
 	docker-compose restart backend frontend
 
-ssh: 
-	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=badchess/backend:latest` /bin/bash
-
-# usage: make run_command cmd="echo hi"
-run_command:
-	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=badchess/backend:latest` /bin/bash -c "$(cmd)"
-
 shell:
-	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=badchess/backend:latest` /bin/bash -c "/code/src/manage.py shell_plus"
+	docker-compose exec backend /app/src/manage.py shell_plus
 
 test:
-	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=badchess/backend:latest` /bin/bash -c "cd /code/src && ./manage.py test --no-input --parallel $(args)" 
+	docker-compose exec backend /app/src/manage.py test --no-input --parallel $(args)
 
 clean_db:
-	echo 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' | docker exec -i `docker ps -q --filter status=running --filter ancestor=postgres:10.1-alpine` psql -U postgres 
+	echo 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' | docker-compose exec db psql -U postgres
 
 init_db: clean_db 
-	cat init_db.sql | docker exec -i `docker ps -q --filter status=running --filter ancestor=postgres:10.1-alpine` psql -U postgres 
-	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=badchess/backend:latest` /bin/bash -c "cd /code/src && ./manage.py migrate"
+	cat ./backend/init_db.sql | docker-compose exec db psql -U postgres
+	docker-compose exec backend /app/src/manage.py migrate
 
 backup_db:
-	docker exec -t `docker ps -q --filter status=running --filter ancestor=postgres:10.1-alpine` pg_dumpall -c -U postgres > badchess_dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
-
-save_requirements:
-	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=badchess/backend:latest` /bin/bash -c "pip3 freeze" | tail -n +2 > requirements.txt
+	docker-compose exec db pg_dumpall -c -U postgres > badchess_dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
 
 install_package:
-	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=badchess/backend:latest` /bin/bash -c "pip3 install $(pkg)"
-	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=badchess/backend:latest` /bin/bash -c "pip3 freeze" | tail -n +2 > requirements.txt
+	docker-compose exec backend pip3 install $(pkg)
+	docker-compose exec backend pip3 freeze | tail -n +2 > requirements.txt
 

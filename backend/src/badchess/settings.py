@@ -52,7 +52,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MIDDLEWARE = (
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -177,10 +176,10 @@ else:
 SHELL_PLUS_PRE_IMPORTS = [
     ('pprint', 'pprint'),
 ]
-
 logging.getLogger('factory').setLevel(logging.WARN)
 logging.getLogger('boto3').setLevel(logging.WARN)
 logging.getLogger('botocore').setLevel(logging.WARN)
 logging.getLogger('nose').setLevel(logging.WARN)
 logging.getLogger('s3transfer').setLevel(logging.WARN)
+logging.getLogger('PIL.Image').setLevel(logging.WARN)
 
