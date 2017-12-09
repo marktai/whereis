@@ -16,10 +16,9 @@ from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.conf import settings
 
-from .models import Profile, Major, Mentor
+from .models import Profile
 from .serializers import (
-    UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, 
-    MentorSerializer,
+    UserSerializer, ProfileSerializer,
 )
 
 import sendgrid
@@ -31,38 +30,6 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-
-
-class ProfileViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows profiles to be viewed or edited.
-    """
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer 
-
-
-class MajorViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows majors to be viewed or edited.
-    """
-    queryset = Major.objects.all()
-    serializer_class = MajorSerializer
-
-
-class MentorViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows mentors to be viewed or edited.
-    """
-    queryset = Mentor.objects.all()
-    serializer_class = MentorSerializer
 
 class CreateUser(generics.CreateAPIView):
     """
@@ -139,45 +106,3 @@ class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
         return get_object_or_404(Profile, user=self.request.user)
 
 
-class MentorsSearchView(generics.ListAPIView):
-    """
-    View for finding a mentor by major
-    """
-    queryset = Mentor.objects.all().filter(active=True)
-    serializer_class = MentorSerializer
-
-    def filter_queryset(self, queryset):
-        major = self.request.query_params['major']
-        return queryset.filter(major__name=major)
-
-
-class MentorView(generics.RetrieveAPIView):
-    """
-    View for getting mentor data by mentor id
-    """
-    serializer_class = MentorSerializer
-    def get_object(self):
-        return get_object_or_404(Mentor, id=int(self.kwargs['mentor_id']))
-
-
-class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View for turning mentor status on (post) and modifying all mentor fields
-    """
-    serializer_class = MentorSerializer
-    def get_object(self):
-        return get_object_or_404(Mentor, profile__user=self.request.user)
-    serializer_class = MentorSerializer
-    def post (self,request):
-
-        profile_id = self.request.user.profile.id
-        profile = Profile.objects.get(id=profile_id)
-        mentor_request = Mentor.objects.filter(profile__user=self.request.user)
-        if not mentor_request.exists():
-            mentor = Mentor(profile=profile, active=True)
-        else:
-            mentor = mentor_request.first()
-            mentor.active = True
-        mentor.save()
-
-        return Response(MentorSerializer(mentor).data)

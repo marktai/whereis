@@ -15,15 +15,3 @@ class ProfileFactory(factory.django.DjangoModelFactory):
         model = models.Profile
     user = factory.SubFactory(UserFactory)
     verification_code = factory.LazyAttribute(lambda a: models.Profile.generate_verification_code())
-
-class MajorFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Major
-
-class MentorFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Mentor
-    profile = factory.SubFactory(ProfileFactory)
-    major = factory.SubFactory(MajorFactory)
-    active = True
-
