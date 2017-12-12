@@ -32,7 +32,7 @@ class OwnGameViewSet(viewsets.ModelViewSet):
     serializer_class = GameSerializer
 
     def get_queryset(self):
-        return self.request.user.profile.games
+        return self.request.user.profile.games.all().order_by('-last_updated_time')
 
 
 class MakeMoveView(APIView):

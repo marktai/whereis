@@ -1,12 +1,12 @@
 import { connect } from 'react-redux'
-import { fetchGame, makeMove } from '../modules/actions'
+import { fetchCreds } from '../modules/actions'
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
     wiring in the actions and state necessary to render a presentational
-    component - in this case, the game:   */
+    component - in this case, the login:   */
 
-import Game from '../components/Game'
+import Login from '../components/Login'
 
 /*  Object of action creators (can also be function that returns object).
     Keys will be passed as props to presentational components. Here we are
@@ -14,28 +14,21 @@ import Game from '../components/Game'
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    fetchGame: (creds) => {
-      dispatch(fetchGame(ownProps.params.game_id, creds))
-    },
-    makeMove: (piece, from_square, to_square, creds) => {
-      dispatch(makeMove(ownProps.params.game_id, from_square, to_square, creds))
+    fetchCreds: (username, password) => {
+      dispatch(fetchCreds(username, password))
     },
   }
 }
 
-const mapStateToProps = (state, ownProps) => ({
-  game_state: state.game,
-  creds_state: state.creds,
-  game_id: parseInt(ownProps.params.game_id),
-})
+const mapStateToProps = (state, ownProps) => ({})
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:
 
     import { createSelector } from 'reselect'
-    const game = (state) => state.game
-    const tripleCount = createSelector(game, (count) => count * 3)
+    const login = (state) => state.login
+    const tripleCount = createSelector(login, (count) => count * 3)
     const mapStateToProps = (state) => ({
-      game: tripleCount(state)
+      login: tripleCount(state)
     })
 
     Selectors can compute derived data, allowing Redux to store the minimal possible state.
@@ -43,4 +36,4 @@ const mapStateToProps = (state, ownProps) => ({
     Selectors are composable. They can be used as input to other selectors.
     https://github.com/reactjs/reselect    */
 
-export default connect(mapStateToProps, mapDispatchToProps)(Game)
+export default connect(mapStateToProps, mapDispatchToProps)(Login)
