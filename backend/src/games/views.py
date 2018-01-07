@@ -22,8 +22,7 @@ from .serializers import (
     GameSerializer, BoardSerializer,
 )
 
-import sendgrid
-from sendgrid.helpers.mail import Email, Content, Substitution, Mail
+import requests
 
 class OwnGameViewSet(viewsets.ModelViewSet):
     """
@@ -39,6 +38,12 @@ class MakeMoveView(APIView):
     def post(self, request, *args, **kwargs):
         game = get_object_or_404(Game, id=kwargs['game_id'])
         game.make_move(request.user.profile, request.data['uci'])
+
+        # update on websockets
+        requests.post(
+            'http://websockets/broadcast/%d' % game.id,
+            json={'type': 'GAME_UPDATE'},
+        )
 
         return Response(GameSerializer(game).data)
 

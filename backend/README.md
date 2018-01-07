@@ -1,4 +1,4 @@
-# Pick My Bruin
+# Bad Chess
 
 ## Setup
 1. Install `docker` and `docker-compose`. 
