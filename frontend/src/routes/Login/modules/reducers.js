@@ -2,6 +2,7 @@ import { combineReducers } from 'redux'
 import {
   REQUEST_LOGIN,
   RECEIVE_LOGIN,
+  RECEIVE_LOGIN_FAILURE,
 } from './actions'
 
 // function visibilityFilter(state = SHOW_ALL, action) {
@@ -20,11 +21,21 @@ function login(state = {}, action) {
         is_fetching: true,
       })
     case RECEIVE_LOGIN:
+      console.log('hi')
+      localStorage.setItem('creds', JSON.stringify(action.creds))
       return Object.assign({}, state,
         {
           creds: action.creds,
           is_fetching: false,
-          lastUpdated: action.received_at,
+        },
+      )
+    case RECEIVE_LOGIN_FAILURE:
+      localStorage.removeItem('creds')
+      console.log(action)
+      return Object.assign({}, state,
+        {
+          creds: {},
+          is_fetching: false,
         },
       )
     default:
