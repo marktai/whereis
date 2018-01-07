@@ -4,7 +4,8 @@ clean:
 
 build: 
 	docker build -t badchess/backend backend
-	docker build -t badchess/backend frontend
+	docker build -t badchess/frontend frontend
+	docker-compose build
 
 run: 
 	-pkill docker-compose
