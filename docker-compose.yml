@@ -3,6 +3,11 @@ version: '3.3'
 services:
   db:
     image: postgres:10.1-alpine
+  websockets:
+    image: badchess/websockets:latest
+    build: ./websockets
+    ports:
+      - "7002:80"
   backend:
     image: badchess/backend:latest
     build: ./backend
@@ -12,6 +17,7 @@ services:
       - "7001:80"
     depends_on:
       - db
+      - websockets
   frontend:
     image: badchess/frontend:latest
     build: ./frontend
@@ -30,4 +36,5 @@ services:
     depends_on:
       - backend
       - frontend
+      - websockets
   

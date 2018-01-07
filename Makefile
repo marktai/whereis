@@ -5,6 +5,7 @@ clean:
 build: 
 	docker build -t badchess/backend backend
 	docker build -t badchess/frontend frontend
+	docker build -t badchess/websockets frontend
 	docker-compose build
 
 run: 
