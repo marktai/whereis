@@ -14,14 +14,13 @@ import {
 //   }
 // }
 
-function login(state = {}, action) {
+function login(state = {is_fetching: false, creds: {}}, action) {
   switch (action.type) {
     case REQUEST_LOGIN:
       return Object.assign({}, state, {
         is_fetching: true,
       })
     case RECEIVE_LOGIN:
-      console.log('hi')
       localStorage.setItem('creds', JSON.stringify(action.creds))
       return Object.assign({}, state,
         {
@@ -31,7 +30,6 @@ function login(state = {}, action) {
       )
     case RECEIVE_LOGIN_FAILURE:
       localStorage.removeItem('creds')
-      console.log(action)
       return Object.assign({}, state,
         {
           creds: {},

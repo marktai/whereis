@@ -14,7 +14,7 @@ export function requestLogin() {
 export const RECEIVE_LOGIN = 'RECEIVE_LOGIN'
 export function receiveLogin(creds) {
   creds.received_at = Date.now()/1000 // in seconds
-  creds.expires_at = creds.received_at/1000 + creds.expires_in
+  creds.expires_at = creds.received_at + creds.expires_in
   return {
     type: RECEIVE_LOGIN,
     creds: creds,
@@ -28,7 +28,6 @@ export function receiveLoginFailure(body) {
     body: body,
   }
 }
-
 
 const send_login = (data, dispatch) => {
   dispatch(requestLogin())
@@ -77,7 +76,6 @@ export function refreshCreds(refresh_token) {
     client_secret: 'SC8ZkC4G4L2tgDmXnffsvfTFsoZGaIaUx0QhgwAMlnKszDwHny1Gt944VilmxvE1U3bnlBNI5qX242DZ2UXet8oniUmjUEXAshpLldULaJ78Lw3YMt0XBmUIUNI3adyt',
     refresh_token,
   }
-
   return dispatch => send_login(data, dispatch)
 }
 

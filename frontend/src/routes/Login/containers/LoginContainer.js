@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { fetchCreds } from '../modules/actions'
+import { fetchCreds, refreshCreds } from '../modules/actions'
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
@@ -17,10 +17,16 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     fetchCreds: (username, password) => {
       dispatch(fetchCreds(username, password))
     },
+    refreshCreds: (refresh_token) => {
+      dispatch(refreshCreds(refresh_token))
+    },
   }
 }
 
-const mapStateToProps = (state, ownProps) => ({})
+const mapStateToProps = (state, ownProps) => ({
+  creds_state: state.creds,
+  location: state.location,
+})
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:
 

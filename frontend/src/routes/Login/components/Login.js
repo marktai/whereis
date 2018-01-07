@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 class Login extends React.Component {
   static propTypes = {
     fetchCreds: PropTypes.func.isRequired,
+    refreshCreds: PropTypes.func.isRequired,
+    creds_state: PropTypes.object.isRequired,
   }
 
   constructor(props) {
@@ -24,6 +26,14 @@ class Login extends React.Component {
     this.setState({
       [name]: value,
     })
+  }
+
+  componentDidMount() {
+    const stored_creds_text = localStorage.getItem('creds')
+    if (stored_creds_text){
+      const stored_creds = JSON.parse(stored_creds_text)
+      this.props.refreshCreds(stored_creds.refresh_token)
+    }
   }
 
   render () {

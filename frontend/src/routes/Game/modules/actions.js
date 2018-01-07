@@ -89,18 +89,20 @@ export function makeMove(game_id, from_square, to_square, creds) {
       },
     )
       .then(
-        response => response.json(),
+        response => {
+          if (!response.ok){
+            return response.json().then(json => Promise.reject(json))
+          }
+          return response.json()
+        },
         // Do not use catch, because that will also catch
         // any errors in the dispatch and resulting render,
         // causing a loop of 'Unexpected batch number' errors.
         // https://github.com/facebook/react/issues/6895
         error => console.log('An error occurred.', error)
       )
-      .then(json =>
-        // We can dispatch many times!
-        // Here, we update the app state with the results of the API call.
-
-        dispatch(receiveGame(game_id, json))
+      .then(
+        json => dispatch(receiveGame(game_id, json)),
       )
   }
 }
