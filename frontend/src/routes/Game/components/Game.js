@@ -15,7 +15,7 @@ const propTypes = {
 
 const lightSquareColor = '#2492FF' // light blue
 const darkSquareColor = '#005EBB' // dark blue
-const squareSize = 30 // dark blue
+const squareSize = 45 // dark blue
 const flip = false
 
 

@@ -96,7 +96,8 @@ class Board(models.Model):
         if not piece_bag:
             black_rows, white_rows = [
                 [
-                    [weighted_choice(norm_dist) for _ in range(8)] for _ in range(2)
+                    [weighted_choice(norm_dist) for _ in range(8)],
+                    [weighted_choice(norm_dist) for _ in range(8)],
                 ] for _ in range(2)
             ]
 
