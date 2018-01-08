@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 import Chessdiagram from 'react-chessdiagram'
 import { refresh_creds_promise } from '../../Login/requireAuth'
 
+import '../styles/game.scss'
+
 const propTypes = {
   creds_state: PropTypes.object,
   game_id: PropTypes.number.isRequired,
@@ -24,6 +26,9 @@ class Game extends Component {
     super(props)
     this.socket = null
     this.last_game_id = null
+    this.state = {
+      turn_color: 'White',
+    }
   }
 
   updateAndSetWebsocket(nextProps){
@@ -47,6 +52,11 @@ class Game extends Component {
     if (nextProps.game_id !== this.last_game_id){
       this.updateAndSetWebsocket(nextProps)
     }
+    if (typeof(nextProps.game_state.game_data) !== 'undefined'){
+      this.setState({
+        turn_color: nextProps.game_state.game_data.turn_count % 2 == 0 ? 'White' : 'Black'
+      })
+    }
   }
 
   render() {
@@ -55,6 +65,7 @@ class Game extends Component {
         <button className='btn btn-primary' onClick={() => {this.props.fetchGame(this.props.creds_state.creds)}} style={{margin: '12px'}}>
           Update Game: {this.props.game_id}
         </button>
+        <div className={`player-turn ${this.state.turn_color}`}>{this.state.turn_color}'s Turn</div>
         <Chessdiagram 
           flip={this.props.flip} 
           fen={this.props.game_state.game_data && this.props.game_state.game_data.board.fen}
