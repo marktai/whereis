@@ -15,7 +15,9 @@ class GameSerializer(serializers.ModelSerializer):
     board = BoardSerializer()
     white_player = ProfileSerializer()
     black_player = ProfileSerializer()
+    turn_count = serializers.IntegerField()
 
     class Meta:
         model = models.Game
-        fields = ('id', 'white_player', 'black_player', 'board', 'created_time', 'last_updated_time')
+        fields = ('id', 'white_player', 'black_player', 'board', 'created_time', 'last_updated_time', 'turn_count')
+        read_only_fields = ('id', 'turn_count')

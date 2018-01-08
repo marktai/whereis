@@ -22,21 +22,30 @@ const flip = false
 class Game extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      socket: null,
-    }
+    this.socket = null
+    this.last_game_id = null
   }
 
+  updateAndSetWebsocket(nextProps){
+    this.last_game_id = nextProps.game_id
 
-  componentDidMount() {
     if (typeof(this.props.creds_state) !== 'undefined'){
       this.props.fetchGame(this.props.creds_state.creds)
     }
-
-    this.state.socket = new WebSocket(`ws://${window.location.host}/ws/listen/${this.props.game_id}`)
-    this.state.socket.onmessage = () => {
+    this.socket = new WebSocket(`ws://${window.location.host}/ws/listen/${this.props.game_id}`)
+    this.socket.onmessage = () => {
       console.log('updated from websockets')
       this.props.fetchGame(this.props.creds_state.creds)
+    }
+  }
+
+  componentDidMount(){
+      this.updateAndSetWebsocket(this.props)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.game_id !== this.last_game_id){
+      this.updateAndSetWebsocket(nextProps)
     }
   }
 

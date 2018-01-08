@@ -5,7 +5,7 @@ import './PageLayout.scss'
 
 export const PageLayout = ({ children }) => (
   <div className='container text-center'>
-    <h1>React Redux Starter Kit</h1>
+    <h1>Bad Chess.  It's really bad.</h1>
     <IndexLink to='/' activeClassName='page-layout__nav-item--active'>Home</IndexLink>
     {' · '}
     <Link to='/login' activeClassName='page-layout__nav-item--active'>Login</Link>
