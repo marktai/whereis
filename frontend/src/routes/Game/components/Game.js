@@ -33,7 +33,7 @@ class Game extends Component {
       this.props.fetchGame(this.props.creds_state.creds)
     }
 
-    this.state.socket = new WebSocket('ws://localhost/ws/listen/' + this.props.game_id)
+    this.state.socket = new WebSocket(`ws://${window.location.host}/ws/listen/${this.props.game_id}`)
     this.state.socket.onmessage = () => {
       console.log('updated from websockets')
       this.props.fetchGame(this.props.creds_state.creds)
