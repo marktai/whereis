@@ -98,7 +98,11 @@ class Board(models.Model):
                 [
                     [weighted_choice(norm_dist) for _ in range(8)],
                     [weighted_choice(norm_dist) for _ in range(8)],
-                ] for _ in range(2)
+                ],
+                [
+                    [weighted_choice(norm_dist) for _ in range(8)],
+                    [weighted_choice(norm_dist) for _ in range(8)],
+                ],
             ]
 
             black_rows[0][random.randrange(8)] = 'k'
@@ -108,8 +112,7 @@ class Board(models.Model):
 
             black_rows, white_rows = map(lambda order: map(lambda row: map(lambda pos: pieces[pos], row), order), [[random.sample(list(range(8)), 8) for _ in range(2)] for _ in range(2)])
 
-        black_rows, white_rows = map(lambda row: '/'.join(map(lambda row: ''.join(row), black_rows)), (black_rows, white_rows))
-        print(white_rows)
+        black_rows, white_rows = map(lambda rows: '/'.join(map(lambda row: ''.join(row), rows)), (black_rows, white_rows))
 
         fen = black_rows + '/8/8/8/8/' + white_rows.upper() + ' w AHah - 0 1'
         return fen
