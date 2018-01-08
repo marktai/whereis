@@ -53,7 +53,7 @@ class Game(models.Model):
         ret = super().save(*args, **kwargs)
 
         if self.board is None:
-            init_board = Board(game=self)
+            init_board = Board.bad_board(game=self)
             init_board.save()
 
         return ret
@@ -65,6 +65,60 @@ class Board(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
     last_updated_time = models.DateTimeField(auto_now=True)
+
+    # probabilities are normalized later
+    correct_distribution = {
+        'p': 8,
+        'r': 2,
+        'n': 2,
+        'b': 2,
+        'q': 1,
+    }
+
+
+    # distribution is a dictionary of pieces to their proportional frequencies
+
+    @classmethod    
+    def generate_bad_fen(cls, distribution=None, piece_bag=False):
+        if distribution is None:
+            distribution = dict(cls.correct_distribution)
+
+        dist_total = sum(distribution.values())
+        norm_dist = {key: val/dist_total for key, val in distribution.items()}
+
+        def weighted_choice(norm_dist):
+            r = random.random()
+            for k, v in norm_dist.items():
+                r -= v
+                if r <= 0:
+                    return k
+
+        if not piece_bag:
+            black_rows, white_rows = [
+                [
+                    [weighted_choice(norm_dist) for _ in range(8)] for _ in range(2)
+                ] for _ in range(2)
+            ]
+
+            black_rows[0][random.randrange(8)] = 'k'
+            white_rows[1][random.randrange(8)] = 'k'
+        else:
+            pieces = [weighted_choice(norm_dist) for _ in range(15)] + ['k']
+
+            black_rows, white_rows = map(lambda order: map(lambda row: map(lambda pos: pieces[pos], row), order), [[random.sample(list(range(8)), 8) for _ in range(2)] for _ in range(2)])
+
+        black_rows, white_rows = map(lambda row: '/'.join(map(lambda row: ''.join(row), black_rows)), (black_rows, white_rows))
+        print(white_rows)
+
+        fen = black_rows + '/8/8/8/8/' + white_rows.upper() + ' w AHah - 0 1'
+        return fen
+
+    @classmethod
+    def bad_board(cls, distribution=None, piece_bag=False, *args, **kwargs):
+        if 'fen' in kwargs:
+            del kwargs[fen]
+        return cls(fen=cls.generate_bad_fen(distribution, piece_bag), *args, **kwargs)
+
 
     def __str__(self):
         return '%s for %s' % (self.fen, self.game)
