@@ -12,7 +12,7 @@ export const PageLayout = ({ children }) => (
     {' · '}
     <Link to='/counter' activeClassName='page-layout__nav-item--active'>Counter</Link>
     {' · '}
-    <Link to='/game/14' activeClassName='page-layout__nav-item--active'>Game</Link>
+    <Link to='/game/15' activeClassName='page-layout__nav-item--active'>Game</Link>
     <div className='page-layout__viewport'>
       {children}
     </div>

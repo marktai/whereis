@@ -103,6 +103,7 @@ export function makeMove(game_id, from_square, to_square, creds) {
       )
       .then(
         json => dispatch(receiveGame(game_id, json)),
+        error => alert(error),
       )
   }
 }

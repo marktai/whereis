@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import Chessdiagram from 'react-chessdiagram';
-import { refresh_creds_promise } from '../../Login/requireAuth';
+import Chessdiagram from 'react-chessdiagram'
+import { refresh_creds_promise } from '../../Login/requireAuth'
 
 const propTypes = {
   creds_state: PropTypes.object,
@@ -13,9 +13,10 @@ const propTypes = {
 }
 
 
-const lightSquareColor = '#2492FF'; // light blue
-const darkSquareColor = '#005EBB'; // dark blue
-const flip = false;
+const lightSquareColor = '#2492FF' // light blue
+const darkSquareColor = '#005EBB' // dark blue
+const squareSize = 30 // dark blue
+const flip = false
 
 
 class Game extends Component {
@@ -31,8 +32,6 @@ class Game extends Component {
     if (typeof(this.props.creds_state) !== 'undefined'){
       this.props.fetchGame(this.props.creds_state.creds)
     }
-
-    console.log('setting up socket')
 
     this.state.socket = new WebSocket('ws://localhost/ws/listen/' + this.props.game_id)
     this.state.socket.onmessage = () => {
@@ -50,7 +49,7 @@ class Game extends Component {
         <Chessdiagram 
           flip={this.props.flip} 
           fen={this.props.game_state.game_data && this.props.game_state.game_data.board.fen}
-          squareSize={30} 
+          squareSize={squareSize} 
           lightSquareColor={lightSquareColor} 
           darkSquareColor={darkSquareColor} 
           onMovePiece={(piece, from_square, to_square) => {this.props.makeMove(piece, from_square, to_square, this.props.creds_state.creds)}}
