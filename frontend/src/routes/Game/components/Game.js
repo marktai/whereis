@@ -27,6 +27,7 @@ class Game extends Component {
     this.socket = null
     this.last_game_id = null
     this.state = {
+      flip: false,
       turn_color: 'White',
       promotion_enabled: false,
       promotion_piece: 'q',
@@ -80,9 +81,16 @@ class Game extends Component {
           Update Game: {this.props.game_id}
         </button>
         <div className={`player-turn ${this.state.turn_color}`}>{this.state.turn_color}'s Turn</div>
+        <input
+          name='flip'
+          type='checkbox'
+          checked={this.state.flip}
+          onChange={this.handleInputChange}
+        />
+        <span>Flip</span>
         <div style={{ padding: '4px' }}>
           <Chessdiagram 
-            flip={this.props.flip} 
+            flip={this.state.flip} 
             fen={this.props.game_state.game_data && this.props.game_state.game_data.board.fen}
             squareSize={squareSize} 
             lightSquareColor={lightSquareColor} 
