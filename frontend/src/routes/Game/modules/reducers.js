@@ -2,6 +2,7 @@ import { combineReducers } from 'redux'
 import {
   REQUEST_GAME,
   RECEIVE_GAME,
+  MAKE_MOVE_FAILURE,
 } from './actions'
 
 // function visibilityFilter(state = SHOW_ALL, action) {
@@ -24,7 +25,14 @@ function game(state = {}, action) {
         {
           game_data: action.game,
           is_fetching: false,
-          lastUpdated: action.received_at,
+          error: null,
+        },
+      )
+    case MAKE_MOVE_FAILURE:
+      return Object.assign({}, state,
+        {
+          is_fetching: false,
+          error: action.error,
         },
       )
     default:

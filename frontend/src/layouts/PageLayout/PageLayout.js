@@ -6,12 +6,12 @@ import './PageLayout.scss'
 export const PageLayout = ({ children }) => (
   <div className='container text-center'>
     <h1>Bad Chess.  It's really bad.</h1>
-    <IndexLink to='/' activeClassName='page-layout__nav-item--active'>Home</IndexLink>
+    {/*<IndexLink to='/' activeClassName='page-layout__nav-item--active'>Home</IndexLink>
+    {' · '}*/}
+    <IndexLink to='/login' activeClassName='page-layout__nav-item--active'>Login</IndexLink>
     {' · '}
-    <Link to='/login' activeClassName='page-layout__nav-item--active'>Login</Link>
-    {' · '}
-    <Link to='/counter' activeClassName='page-layout__nav-item--active'>Counter</Link>
-    {' · '}
+    {/*<Link to='/counter' activeClassName='page-layout__nav-item--active'>Counter</Link>
+    {' · '}*/}
     <Link to='/game/15' activeClassName='page-layout__nav-item--active'>Game</Link>
     <div className='page-layout__viewport'>
       {children}

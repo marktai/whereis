@@ -17,16 +17,16 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     fetchGame: (creds) => {
       dispatch(fetchGame(ownProps.params.game_id, creds))
     },
-    makeMove: (piece, from_square, to_square, creds) => {
-      dispatch(makeMove(ownProps.params.game_id, from_square, to_square, creds))
+    makeMove: (piece, from_square, to_square, promotion, creds) => {
+      dispatch(makeMove(ownProps.params.game_id, from_square, to_square, promotion, creds))
     },
   }
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  game_state: state.game,
   creds_state: state.creds,
   game_id: parseInt(ownProps.params.game_id),
+  game_state: state.game,
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:

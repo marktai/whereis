@@ -18,10 +18,16 @@ export function receiveGame(game_id, game) {
     type: RECEIVE_GAME,
     game_id,
     game,
-    received_at: Date.now(),
   }
 }
 
+export const MAKE_MOVE_FAILURE = 'MAKE_MOVE_FAILURE'
+export function makeMoveFailure(error) {
+  return {
+    type: MAKE_MOVE_FAILURE,
+    error,
+  }
+}
 
 // Meet our first thunk action creator!
 // Though its insides are different, you would use it just like any other action creator:
@@ -68,12 +74,12 @@ export function fetchGame(game_id, creds) {
   }
 }
 
-export function makeMove(game_id, from_square, to_square, creds) {
+export function makeMove(game_id, from_square, to_square, promotion, creds) {
   return function(dispatch){
     dispatch(requestGame(game_id))
 
 
-    const uci = `${from_square}${to_square}`
+    const uci = `${from_square}${to_square}${promotion}`
 
     return fetch(
       `/api/me/games/${game_id}/move`, 
@@ -103,7 +109,7 @@ export function makeMove(game_id, from_square, to_square, creds) {
       )
       .then(
         json => dispatch(receiveGame(game_id, json)),
-        error => alert(error),
+        error => dispatch(makeMoveFailure(error)),
       )
   }
 }

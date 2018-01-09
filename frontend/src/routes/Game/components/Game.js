@@ -28,7 +28,11 @@ class Game extends Component {
     this.last_game_id = null
     this.state = {
       turn_color: 'White',
+      promotion_enabled: false,
+      promotion_piece: 'q',
     }
+
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   updateAndSetWebsocket(nextProps){
@@ -59,6 +63,16 @@ class Game extends Component {
     }
   }
 
+  handleInputChange(event) {
+    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+    const name = event.target.name;
+
+    console.log(name, value)
+    this.setState({
+      [name]: value
+    });
+  }
+
   render() {
     return (
       <div style={{ margin: '0 auto' }} >
@@ -66,14 +80,38 @@ class Game extends Component {
           Update Game: {this.props.game_id}
         </button>
         <div className={`player-turn ${this.state.turn_color}`}>{this.state.turn_color}'s Turn</div>
-        <Chessdiagram 
-          flip={this.props.flip} 
-          fen={this.props.game_state.game_data && this.props.game_state.game_data.board.fen}
-          squareSize={squareSize} 
-          lightSquareColor={lightSquareColor} 
-          darkSquareColor={darkSquareColor} 
-          onMovePiece={(piece, from_square, to_square) => {this.props.makeMove(piece, from_square, to_square, this.props.creds_state.creds)}}
-        />
+        <div style={{ padding: '4px' }}>
+          <Chessdiagram 
+            flip={this.props.flip} 
+            fen={this.props.game_state.game_data && this.props.game_state.game_data.board.fen}
+            squareSize={squareSize} 
+            lightSquareColor={lightSquareColor} 
+            darkSquareColor={darkSquareColor} 
+            onMovePiece={(piece, from_square, to_square) => {this.props.makeMove(piece, from_square, to_square, this.state.promotion_enabled ? this.state.promotion_piece : '', this.props.creds_state.creds)}}
+          />
+        </div>
+        <div className='error-message'>{this.props.game_state.error ? this.props.game_state.error : ''}</div>
+
+        <div>
+          <div>Promotion selector</div>
+          <input
+            name='promotion_enabled'
+            type='checkbox'
+            checked={this.state.promotion_enabled}
+            onChange={this.handleInputChange}
+          />
+          <select 
+            name='promotion_piece'
+            value={this.state.promotion_piece} 
+            onChange={this.handleInputChange}
+          >
+            <option value='n'>Knight</option>
+            <option value='b'>Bishop</option>
+            <option value='r'>Rook</option>
+            <option value='q'>Queen</option>
+          </select>
+        </div>
+
       </div>
     )
   }
