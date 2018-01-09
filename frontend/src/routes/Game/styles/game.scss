@@ -1,4 +1,6 @@
 .player-turn {
+    border: 2px grey solid;
+    border-radius: 1px;
     font-size: 20px;
     transition: background linear .5s, color linear 1s;
     margin: 8px auto;
@@ -6,13 +8,13 @@
 }
 
 .Black {
-    background: white;
-    color: black;
+    background: black;
+    color: white;
 }
 
 .White {
-    background: black;
-    color: white;
+    background: white;
+    color: black;
 }
 
 .page-layout__viewport {
