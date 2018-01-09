@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 from rest_framework import exceptions as drf_exceptions
 
 import chess
-
 # Create your models here.
 class Game(models.Model):
     class PlayerError(drf_exceptions.ValidationError):
@@ -76,7 +75,6 @@ class Board(models.Model):
         'q': 1,
     }
 
-
     # distribution is a dictionary of pieces to their proportional frequencies
 
     @classmethod    
@@ -107,17 +105,52 @@ class Board(models.Model):
             ]
 
             black_rows[0][random.randrange(8)] = 'k'
-            white_rows[1][random.randrange(8)] = 'k'
+            white_rows[0][random.randrange(8)] = 'k'
         else:
             pieces = [weighted_choice(norm_dist) for _ in range(15)] + ['k']
 
             pieces = list(map(lambda order: list(map(lambda pos: pieces[pos], order)), [ random.sample(list(range(16)), 16), random.sample(list(range(16)), 16)]))
+            
             black_rows = [pieces[0][0:8], pieces[0][8:16]]
             white_rows = [pieces[1][0:8], pieces[1][8:16]]
 
-        black_rows, white_rows = map(lambda rows: '/'.join(map(lambda row: ''.join(row), rows)), (black_rows, white_rows))
+            for rows in (black_rows, white_rows):
+                try:
+                    k_index = rows[1].index('k')
+                    swap = random.randrange(8)
+                    rows[0][swap], rows[1][k_index] = rows[1][k_index], rows[0][swap]
+                except ValueError as e:
+                    # king is not in forward row
+                    pass
 
-        fen = black_rows + '/8/8/8/8/' + white_rows.upper() + ' w AHah - 0 1'
+        # both rows are [0: back row, 1: front row]
+        rooks = [[], []]
+
+        for i, rows in enumerate((black_rows, white_rows)):
+            for j, piece in reversed(list(enumerate(rows[0]))):
+                letter_position = chr(97 + j)
+                if piece == 'r':
+                    rooks[i].append(letter_position)
+                    break
+                if piece == 'k':
+                    break
+            for j, piece in enumerate(rows[0]):
+                letter_position = chr(97 + j)
+                if piece == 'r' and letter_position not in rooks[i]:
+                    rooks[i].append(letter_position)
+                    break
+                if piece == 'k':
+                    break
+        
+        black_rows, white_rows = map(lambda rows: '/'.join(map(lambda row: ''.join(row), rows)), (black_rows, reversed(white_rows)))
+
+        fen = '%s/8/8/8/8/%s w %s%s - 0 1' % (
+            black_rows,
+            white_rows.upper(),
+            ''.join(rooks[1]).upper(),
+            ''.join(rooks[0])
+        )
+
         return fen
 
     @classmethod
