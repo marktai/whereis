@@ -110,7 +110,9 @@ class Board(models.Model):
         else:
             pieces = [weighted_choice(norm_dist) for _ in range(15)] + ['k']
 
-            black_rows, white_rows = map(lambda order: map(lambda row: map(lambda pos: pieces[pos], row), order), [[random.sample(list(range(8)), 8) for _ in range(2)] for _ in range(2)])
+            pieces = list(map(lambda order: list(map(lambda pos: pieces[pos], order)), [ random.sample(list(range(16)), 16), random.sample(list(range(16)), 16)]))
+            black_rows = [pieces[0][0:8], pieces[0][8:16]]
+            white_rows = [pieces[1][0:8], pieces[1][8:16]]
 
         black_rows, white_rows = map(lambda rows: '/'.join(map(lambda row: ''.join(row), rows)), (black_rows, white_rows))
 
