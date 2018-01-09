@@ -43,9 +43,10 @@ class Game(models.Model):
         if self.turn_count % 2 == 1 and player != self.black_player:
             raise self.PlayerError('It is black\'s turn (%s)' % self.black_player)
 
-        board = self.board.make_move(uci)
-        if board is None:
-            raise self.MoveError('%s is an invalid move' % uci)
+        try:
+            board = self.board.make_move(uci)
+        except ValueError as e: # invalid move
+            raise self.MoveError('%s is an invalid move because of %s' % (uci, e))
 
         return board
 
@@ -135,22 +136,18 @@ class Board(models.Model):
             self._fen_stale = self.fen
         return self._chess_board
 
-    # returns new board or None
+    # returns new board or throws exception
     def make_move(self, uci):
-        try:
-            move = self.chess_board().parse_uci(uci)
+        move = self.chess_board().parse_uci(uci)
 
-            new_chess_board = chess.Board(self.fen, chess960=True)
-            new_chess_board.push(move)
+        new_chess_board = chess.Board(self.fen, chess960=True)
+        new_chess_board.push(move)
 
-            new_board = Board(
-                turn_count=self.turn_count+1, 
-                fen=new_chess_board.fen(shredder=True),
-                game=self.game,
-            )
+        new_board = Board(
+            turn_count=self.turn_count+1, 
+            fen=new_chess_board.fen(shredder=True),
+            game=self.game,
+        )
 
-            new_board.save()
-            return new_board
-
-        except ValueError as e: # invalid move
-            return None
+        new_board.save()
+        return new_board
