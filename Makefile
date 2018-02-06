@@ -3,9 +3,6 @@ default: build
 clean:
 
 build: 
-	docker build -t badchess/backend backend
-	docker build -t badchess/frontend frontend
-	docker build -t badchess/websockets frontend
 	docker-compose build
 
 run: 
@@ -13,7 +10,7 @@ run:
 	docker-compose up
 
 restart:
-	docker-compose restart backend frontend
+	docker-compose restart backend frontend websockets
 
 shell:
 	docker-compose exec backend /app/src/manage.py shell_plus
