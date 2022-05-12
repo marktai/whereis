@@ -5,7 +5,7 @@ services:
     image: postgres:10.1-alpine
   backend:
     build: .
-    image: badchess/backend:latest
+    image: clover/backend:latest
     volumes:
       - .:/code
     ports:

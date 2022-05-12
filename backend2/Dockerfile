@@ -1,9 +1,9 @@
-FROM python:3.7-rc-alpine
+FROM python:3.10-rc-alpine
 
 ENV DJANGO_PRODUCTION=false
 ENV PYTHONUNBUFFERED 1
 
-RUN apk add --no-cache libpq postgresql-dev build-base zlib-dev jpeg-dev tiff-dev freetype-dev lcms-dev libwebp-dev py-boto
+RUN apk add --no-cache libpq postgresql-dev build-base zlib-dev jpeg-dev tiff-dev freetype-dev libwebp-dev py-boto postgresql-client
 
 RUN mkdir /logs
 RUN mkdir /logs/gunicorn
