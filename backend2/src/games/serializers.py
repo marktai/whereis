@@ -6,7 +6,8 @@ from . import models
 class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Board
-        fields = ('id', 'clues', 'cards', 'answer', 'answer_cards', 'created_time', 'last_updated_time')
+        fields = ('id', 'clues', 'cards', 'answer', 'answer_cards', 'suggested_num_cards', 'suggested_possible_cards', 'created_time', 'last_updated_time')
+        read_only_fields = ('id', 'answer_cards', 'suggested_possible_cards', 'created_time', 'last_updated_time')
 
 # class GameSerializer(serializers.ModelSerializer):
 #     board = BoardSerializer()

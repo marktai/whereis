@@ -67,7 +67,7 @@ def chunks(lst, n):
 
 class BoardManager(models.Manager):
     def create_board(self, *args, **kwargs):
-        cards = list(chunks(random.choices(words, k=Board.CARDS_IN_ANSWER * Board.WORDS_PER_CARD), Board.WORDS_PER_CARD))
+        cards = list(chunks(random.choices(words, k=Board.CARDS_GENERATED * Board.WORDS_PER_CARD), Board.WORDS_PER_CARD))
         answer = tuple((
             (
                 card_index,
@@ -75,10 +75,7 @@ class BoardManager(models.Manager):
             )
             for card_index in random.sample(range(Board.CARDS_IN_ANSWER), k=Board.CARDS_IN_ANSWER)
         ))
-        print(cards)
-        print(answer)
         board = self.create(cards=cards, answer=answer, *args, **kwargs)
-        print(board)
 
         return board
 
@@ -115,6 +112,8 @@ class Board(models.Model):
         size=CARDS_IN_ANSWER,
     )
 
+    suggested_num_cards = models.IntegerField(null=True)
+
     @property
     def answer_cards(self):
         return tuple((
@@ -122,6 +121,33 @@ class Board(models.Model):
             for (card_index, word_rotation_offset) in self.answer
         ))
 
+    @property
+    def suggested_possible_cards(self):
+        if self.suggested_num_cards is None:
+            return None
+        return self.possible_cards(self.suggested_num_cards)
+
+    def possible_cards(self, n):
+        answer_cards = tuple((
+            tuple(self.cards[card_index]) for (card_index, _) in self.answer
+        ))
+        answer_cards_set = set(answer_cards)
+        non_answer_cards = tuple((
+            x for x in self.cards if tuple(x) not in answer_cards
+        ))
+
+        num_non_answer_cards = min(
+            max(
+                n - len(answer_cards),
+                0,
+            ),
+            len(self.cards) - len(answer_cards),
+        )
+
+        return tuple(sorted(
+            tuple(answer_cards + non_answer_cards[0:num_non_answer_cards]),
+            key = lambda x: hash(tuple(x)),
+        ))
 
     def __str__(self):
-        return 'board with answer: %s' % (str(self.answer_cards))
+        return 'board with clues: %s and answer: %s' % (str(self.clues), str(self.answer_cards))
