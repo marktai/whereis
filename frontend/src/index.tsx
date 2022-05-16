@@ -97,6 +97,8 @@ class Game extends React.Component<{}, GameState> {
       </div>
     );
   }
+
+
 }
 
 const root = ReactDOM.createRoot(
@@ -108,6 +110,11 @@ root.render(
   </React.StrictMode>
 );
 
+const account = async () => {
+  console.log(await CloverService.getGame(1))
+  console.log(await CloverService.submitClues(1, ['a', 'b', 'c', 'd'], 5))
+};
+account();
 
 
 // If you want to start measuring performance in your app, pass a function
