@@ -67,7 +67,7 @@ def chunks(lst, n):
 
 class BoardManager(models.Manager):
     def create_board(self, *args, **kwargs):
-        cards = list(chunks(random.choices(words, k=Board.CARDS_GENERATED * Board.WORDS_PER_CARD), Board.WORDS_PER_CARD))
+        cards = list(chunks(random.sample(words, k=Board.CARDS_GENERATED * Board.WORDS_PER_CARD), Board.WORDS_PER_CARD))
         answer = tuple((
             (
                 card_index,

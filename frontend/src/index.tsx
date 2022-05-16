@@ -1,120 +1,41 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './index.css';
 import CloverService from './api';
+import 'bootstrap/dist/css/bootstrap.css'
+import Button from 'react-bootstrap/Button';
+import List from './pages/list';
+import Clues from './pages/clues';
+import Guess from './pages/guess';
 
-
-type SquareProps = {
-  value: null|string,
-  onClick: () => void,
+const account = async () => {
+  console.log(await CloverService.getGame(1))
+  console.log(await CloverService.submitClues(1, ['a', 'b', 'c', 'd'], 5))
 };
-
-const Square = (props: SquareProps) =>
-  <button className="square" onClick={props.onClick}>
-    {props.value}
-  </button>
-;
-
-type BoardState = {
-  squares: Array<null|string>,
-  xIsNext: boolean,
-}
-
-type BoardProps = {
-  value: BoardState,
-  onClick: (i: number) => void,
-};
-
-class Board extends React.Component<BoardProps, {}> {
-  renderSquare(i: number) {
-    return <Square
-      value={this.props.value.squares[i]}
-      onClick={() => {this.props.onClick(i)}}
-    />;
-  }
-
-  render() {
-    return (
-      <div>
-        <div className="board-row">
-          {this.renderSquare(0)}{this.renderSquare(1)}{this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}{this.renderSquare(4)}{this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}{this.renderSquare(7)}{this.renderSquare(8)}
-        </div>
-      </div>
-    );
-  }
-}
-
-type GameState = {
-  history: Array<BoardState>;
-};
-
-class Game extends React.Component<{}, GameState> {
-  state: GameState = {
-    history: [
-      {
-        squares: Array(9).fill(null),
-        xIsNext: true,
-      },
-    ],
-  };
-
-  handleClick(i: number) {
-    const history = this.state.history;
-    const current = history[history.length - 1];
-    const squares = current.squares.slice();
-    squares[i] = current.xIsNext ? 'X' : 'O';
-    const newCurrent = {
-      squares: squares,
-      xIsNext: !current.xIsNext,
-    };
-    const nextState = {
-      history: history.concat([newCurrent])
-    };
-    console.log(nextState);
-    this.setState(nextState);
-  }
-
-  render() {
-    const history = this.state.history;
-    const current = history[history.length - 1];
-
-    const status = 'Next player: ' + (current.xIsNext ? 'X' : 'O');
-    return (
-      <div className="game">
-        <div className="game-board">
-          <Board value={current} onClick={(i) => this.handleClick(i)}/>
-        </div>
-        <div className="game-info">
-          <div className="status">{status}</div>
-          <ol>{/* TODO */}</ol>
-        </div>
-      </div>
-    );
-  }
-
-
-}
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <Game />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossOrigin="anonymous"
+    />
+    <BrowserRouter>
+      <Routes>
+        <Route index element={<List />} />
+        <Route path="/games/:id/clues" element={<Clues />} />
+        <Route path="/games/:id/guess" element={<Guess />} />
+        <Route path="/button" element={<Button onClick={account} />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
-const account = async () => {
-  console.log(await CloverService.getGame(1))
-  console.log(await CloverService.submitClues(1, ['a', 'b', 'c', 'd'], 5))
-};
-account();
 
 
 // If you want to start measuring performance in your app, pass a function

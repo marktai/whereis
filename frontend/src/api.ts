@@ -1,26 +1,30 @@
-type Answer = [number, number];
-type Card = [string, string, string, string];
+export type AnswerType = [number, number];
+export type CardType = [string, string, string, string];
 
-interface Board {
+export type GameType = {
   id: number,
   clues: null|Array<string>,
   answer: [
-    Answer,
-    Answer,
-    Answer,
-    Answer,
+    AnswerType,
+    AnswerType,
+    AnswerType,
+    AnswerType,
   ],
   answer_cards: [
-    Card,
-    Card,
-    Card,
-    Card,
+    CardType,
+    CardType,
+    CardType,
+    CardType,
   ],
   suggested_num_cards: null|number,
-  suggested_possible_cards: null|Array<Card>,
+  suggested_possible_cards: null|Array<CardType>,
   created_time: string,
   last_updated_time: string,
-}
+};
+
+type GameListResponse = {
+  results: Array<GameType>,
+};
 
 export async function http<T>(
   request: RequestInfo
@@ -83,21 +87,36 @@ export async function patch<T>(
 export default class CloverService {
   public static host = 'http://localhost:7080/api';
 
-  public static async getGame(id: number): Promise<Board> {
-    return await get<Board>(`${this.host}/games/${id}`);
+  public static async getGame(id: number|string): Promise<GameType> {
+    return await get<GameType>(`${this.host}/games/${id}`);
   }
 
-  public static async submitClues(id: number, clues: Array<string>, suggestedNumCards: number): Promise<Board> {
+  public static async submitClues(id: number|string, clues: Array<string>, suggestedNumCards: number): Promise<GameType> {
     const body = {
       clues: clues,
       suggested_num_cards: suggestedNumCards,
     }
 
-    return await patch<Board>(`${this.host}/games/${id}`, body);
+    return await patch<GameType>(`${this.host}/games/${id}`, body);
   }
 
-  public static async getGames(): Promise<Array<Board>> {
-    return await get<Board[]>(`${this.host}/games`);
+  public static async getGames(): Promise<Array<GameType>> {
+    const gamesResponse = await get<GameListResponse>(`${this.host}/games`);
+    var sortedGames = gamesResponse.results.slice();
+    sortedGames.sort((a, b) => {
+      if (a.last_updated_time === b.last_updated_time) {
+        return 0;
+      } else if (a.last_updated_time < b.last_updated_time) {
+        return 1;
+      } else {
+        return -1;
+      };
+    });
+    return sortedGames;
+  }
+
+  public static async newGame(): Promise<GameType> {
+    return await post<GameType>(`${this.host}/games`, {});
   }
 }
 
