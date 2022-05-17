@@ -2,7 +2,7 @@ from django.db import models
 import json, random, string, os
 
 from django.db import models, transaction
-from django.contrib.postgres.fields import ArrayField
+from django_jsonform.models.fields import ArrayField
 
 from rest_framework import exceptions as drf_exceptions
 
@@ -165,7 +165,7 @@ class Board(models.Model):
         ]
 
     def __str__(self):
-        return 'board with clues: %s and answer: %s' % (str(self.clues), str(self.answer_cards))
+        return '%s\'s game %d with clues: %s and answer: %s' % (self.author, self.id, str(self.clues), str(self.answer_cards))
 
     def check_guess(self, guess_answers, n=None):
         if n is None:
