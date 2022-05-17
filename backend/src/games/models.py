@@ -71,7 +71,7 @@ class BoardManager(models.Manager):
         answer = tuple((
             (
                 card_index,
-                random.randint(0, Board.WORDS_PER_CARD),
+                random.randint(0, Board.WORDS_PER_CARD - 1),
             )
             for card_index in random.sample(range(Board.CARDS_GENERATED), k=Board.CARDS_IN_ANSWER)
         ))

@@ -63,7 +63,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
   renderCard(i: number) {
     const card = this.state.game?.answer_cards?.[i]
     return (
-      <Container>
+      <Container className="clover-card">
         <Row>
           <Col><strong>{card?.[0]}</strong></Col> <Col>{card?.[3]}</Col>
         </Row>
@@ -90,7 +90,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
             },
           });
         }}
-        placeholder={"Clue " + i.toString()}
+        placeholder={"Clue " + (i+1).toString()}
       />
     );
   }
@@ -123,7 +123,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
   render() {
     return (
       <div className="game">
-        <Container fluid>
+        <Container>
           <Row>
             <Col xs={4}></Col>
             <Col xs={8}>{this.renderCard(0)}</Col>
@@ -171,9 +171,17 @@ class Clues extends React.Component<CluesProps, CluesState> {
           <Row>
             <Col>{this.renderNumCardsSelect()}</Col>
             <Col>
-              <Button onClick={() => {this.submitClues()}}>Submit Clues </Button>
+              <Button onClick={() => {this.submitClues()}}>{this.state.game?.clues == null ? "Submit Clues" : "Update Clues" }</Button>
             </Col>
           </Row>
+          {
+            this.state.game?.clues != null ?
+              <Row>
+                <Col>Clues submitted! To guess, go to <a href={`http://clover.marktai.com/games/${this.props.id}/guess`}>http://clover.marktai.com/games/{this.props.id}/guess</a>
+                </Col>
+              </Row>
+            : null
+          }
         </Container>
       </div>
     );

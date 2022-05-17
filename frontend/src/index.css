@@ -54,6 +54,10 @@ ol, ul {
   border-radius: 4px;
 }
 
+.clover-card.selected {
+  box-shadow: 0 0 0 0.2rem rgb(108 117 125 / 50%)
+}
+
 .clover-card.correct-card {
   border: 4px green solid;
 }

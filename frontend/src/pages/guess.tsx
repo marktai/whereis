@@ -201,6 +201,10 @@ class Game extends React.Component<GameProps, GameState> {
       cardClasses.push('correct-card-incorrect-rotation');
     }
 
+    if (this.state.guess.currentSelectedCard === i) {
+      cardClasses.push('selected');
+    }
+
     return (
       <Container className={cardClasses.join(' ')}onClick={(e) => this.handleCardClick(i, e)}>
         <Row>
@@ -228,7 +232,7 @@ class Game extends React.Component<GameProps, GameState> {
   render() {
     return (
       <div className="game">
-        <Container fluid>
+        <Container>
           <Row>
             <Col xs={4}></Col>
             <Col xs={8}>{this.renderCard(0)}</Col>
