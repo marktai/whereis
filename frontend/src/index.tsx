@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import './index.css';
 import CloverService from './api';
 import 'bootstrap/dist/css/bootstrap.css'
+import './index.css';
 import Button from 'react-bootstrap/Button';
 import List from './pages/list';
 import Clues from './pages/clues';

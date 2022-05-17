@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import CloverService from '../api';
-import { GameType, AnswerType, CardType } from '../api';
+import { GameType, AnswerType, CardType, GuessResponseType } from '../api';
 
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
@@ -65,7 +65,7 @@ type GameState = {
     cardPositions: Array<AnswerType>,
     currentSelectedCard: null|number,
   },
-  previousGuesses: Array<AnswerType>,
+  previousGuesses: Array<[Array<AnswerType>,GuessResponseType]>,
 };
 
 function rotateArray<T>(a: Array<T>, n: number): Array<T> {
@@ -95,44 +95,41 @@ class Game extends React.Component<GameProps, GameState> {
   }
 
   async submitGuess() {
-    // const game = await CloverService.submitClues(
-    //   this.props.id,
-    //   this.state.formData.clues,
-    //   parseInt(this.state.formData.suggestedNumClues)
-    // );
-    // this.setState({
-    //   game: game,
-    //   formData: {
-    //     clues: game.clues || ['', '', '', ''],
-    //     suggestedNumClues: game.suggested_num_cards?.toString() || '5',
-    //   },
-    // })
+    const guess = JSON.parse(JSON.stringify(this.state.guess.cardPositions.slice(0, 4)));
+    const response = await CloverService.makeGuess(
+      this.props.id,
+      guess,
+    );
+    this.setState({
+      previousGuesses: this.state.previousGuesses.concat([
+        [guess, response],
+      ]),
+    })
   }
 
   async componentDidMount() {
     await this.refresh();
   }
 
-  // handleClick(i: number) {
-  //   const history = this.state.history;
-  //   const current = history[history.length - 1];
-  //   const squares = current.squares.slice();
-  //   squares[i] = current.xIsNext ? 'X' : 'O';
-  //   const newCurrent = {
-  //     squares: squares,
-  //     xIsNext: !current.xIsNext,
-  //   };
-  //   const nextState = {
-  //     history: history.concat([newCurrent])
-  //   };
-  //   this.setState(nextState);
-  // }
+  positionKnowledge(): Array<[number, AnswerType]> {
+    const init: Array<[number, AnswerType]> = [[0, [0, 0]], [0, [0, 0]], [0, [0, 0]], [0, [0, 0]]];
+    return this.state.previousGuesses.reduce( (acc, cur) => {
+      return cur[1].map( (r, i) => {
+        if (r != 0 && (acc[i][0] === 0 || r < acc[i][0])) {
+          return [r, cur[0][i]];
+        } else {
+          return acc[i];
+        }
+      });
+    }, init)
+  }
 
   rotateCard(i: number, n: number, e: any) {
     e.stopPropagation();
     const newCardPositions = this.state.guess.cardPositions.slice();
 
-    const newRotation = (this.state.guess.cardPositions[i][1] + n) % 4;
+    // https://stackoverflow.com/questions/4467539/javascript-modulo-gives-a-negative-result-for-negative-numbers
+    const newRotation = (((this.state.guess.cardPositions[i][1] + n) % 4) + 4) % 4;
     newCardPositions[i][1] = newRotation;
     this.setState({
       guess: {
@@ -171,13 +168,41 @@ class Game extends React.Component<GameProps, GameState> {
     if (this.state.guess.cardPositions.length - 1 < i) {
       return null;
     }
+
     const cardPosition = this.state.guess.cardPositions[i];
     const card = rotateArray(
       this.state.game?.suggested_possible_cards?.[cardPosition[0]] as CardType,
       cardPosition[1],
     );
+    const positionKnowledge = this.positionKnowledge();
+
+    let cardState = 0;
+    if (i < 4) {
+      // matching position
+      if (positionKnowledge[i][0] > 0 &&
+          this.state.guess.cardPositions[i][0] === positionKnowledge[i][1][0]
+      ) {
+        // matching position and rotation
+        if (positionKnowledge[i][0] === 1 &&
+            this.state.guess.cardPositions[i][1] === positionKnowledge[i][1][1]
+        ) {
+          cardState = 1;
+        } else {
+          cardState = 2;
+        }
+      }
+    }
+
+    let cardClasses = ['clover-card'];
+
+    if (cardState == 1) {
+      cardClasses.push('correct-card');
+    } else if (cardState == 2) {
+      cardClasses.push('correct-card-incorrect-rotation');
+    }
+
     return (
-      <Container onClick={(e) => this.handleCardClick(i, e)}>
+      <Container className={cardClasses.join(' ')}onClick={(e) => this.handleCardClick(i, e)}>
         <Row>
           <Col xs={5}><strong>{card?.[0]}</strong></Col>
           <Col xs={2}><Button size='sm' onClick={(e) => {this.rotateCard(i, 1, e)}}>🔃</Button></Col>
@@ -206,7 +231,7 @@ class Game extends React.Component<GameProps, GameState> {
         <Container fluid>
           <Row>
             <Col xs={4}></Col>
-            <Col xs={8}>{this.renderCard(3)}</Col>
+            <Col xs={8}>{this.renderCard(0)}</Col>
           </Row>
           <Row>
             <Col xs={4}>
@@ -216,7 +241,7 @@ class Game extends React.Component<GameProps, GameState> {
           </Row>
           <Row>
             <Col xs={4}></Col>
-            <Col xs={8}>{this.renderCard(0)}</Col>
+            <Col xs={8}>{this.renderCard(1)}</Col>
           </Row>
           <Row>
             <Col xs={4}>
@@ -226,7 +251,7 @@ class Game extends React.Component<GameProps, GameState> {
           </Row>
           <Row>
             <Col xs={4}></Col>
-            <Col xs={8}>{this.renderCard(1)}</Col>
+            <Col xs={8}>{this.renderCard(2)}</Col>
           </Row>
           <Row>
             <Col xs={4}>
@@ -236,7 +261,7 @@ class Game extends React.Component<GameProps, GameState> {
           </Row>
           <Row>
             <Col xs={4}></Col>
-            <Col xs={8}>{this.renderCard(2)}</Col>
+            <Col xs={8}>{this.renderCard(3)}</Col>
           </Row>
           <Row>
             <Col xs={4}>
@@ -246,7 +271,7 @@ class Game extends React.Component<GameProps, GameState> {
           </Row>
           <Row>
             <Col xs={4}></Col>
-            <Col xs={8}>{this.renderCard(3)}</Col>
+            <Col xs={8}>{this.renderCard(0)}</Col>
           </Row>
           <Row>
             <Col>

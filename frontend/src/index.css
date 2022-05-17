@@ -48,3 +48,18 @@ ol, ul {
 .game-info {
   margin-left: 20px;
 }
+
+.clover-card {
+  border: 1px grey solid;
+  border-radius: 4px;
+}
+
+.clover-card.correct-card {
+  border: 4px green solid;
+}
+
+.clover-card.correct-card-incorrect-rotation {
+  border: 2px #F6BE00 solid;
+}
+
+

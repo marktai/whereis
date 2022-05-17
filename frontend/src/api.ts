@@ -26,6 +26,12 @@ type GameListResponse = {
   results: Array<GameType>,
 };
 
+export type GuessResponseType = Array<number>;
+
+type GuessResponse = {
+  results: GuessResponseType,
+};
+
 export async function http<T>(
   request: RequestInfo
 ): Promise<T> {
@@ -85,19 +91,10 @@ export async function patch<T>(
 };
 
 export default class CloverService {
-  public static host = 'http://localhost:7080/api';
+  public static host = '/api';
 
   public static async getGame(id: number|string): Promise<GameType> {
     return await get<GameType>(`${this.host}/games/${id}`);
-  }
-
-  public static async submitClues(id: number|string, clues: Array<string>, suggestedNumCards: number): Promise<GameType> {
-    const body = {
-      clues: clues,
-      suggested_num_cards: suggestedNumCards,
-    }
-
-    return await patch<GameType>(`${this.host}/games/${id}`, body);
   }
 
   public static async getGames(): Promise<Array<GameType>> {
@@ -117,6 +114,24 @@ export default class CloverService {
 
   public static async newGame(): Promise<GameType> {
     return await post<GameType>(`${this.host}/games`, {});
+  }
+
+  public static async submitClues(id: number|string, clues: Array<string>, suggestedNumCards: number): Promise<GameType> {
+    const body = {
+      clues: clues,
+      suggested_num_cards: suggestedNumCards,
+    }
+
+    return await patch<GameType>(`${this.host}/games/${id}`, body);
+  }
+
+  public static async makeGuess(id: number|string, guess: Array<AnswerType>): Promise<GuessResponseType> {
+    const body = {
+      guess: guess,
+    }
+
+    const response = await post<GuessResponse>(`${this.host}/games/${id}/guess`, body);
+    return response.results;
   }
 }
 

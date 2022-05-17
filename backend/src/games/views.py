@@ -32,3 +32,16 @@ class BoardViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         new_board = Board.objects.create_board()
         return Response(BoardSerializer(new_board).data)
+
+class MakeGuessView(APIView):
+    def post(self, request, *args, **kwargs):
+        game = get_object_or_404(Board, id=kwargs['game_id'])
+        result = game.check_guess(request.data['guess'])
+
+        # # update on websockets
+        # requests.post(
+        #     'http://websockets/broadcast/%d' % game.id,
+        #     json={'type': 'GAME_UPDATE'},
+        # )
+
+        return Response({'results': result})

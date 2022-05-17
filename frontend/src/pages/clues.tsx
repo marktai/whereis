@@ -126,7 +126,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
         <Container fluid>
           <Row>
             <Col xs={4}></Col>
-            <Col xs={8}>{this.renderCard(3)}</Col>
+            <Col xs={8}>{this.renderCard(0)}</Col>
           </Row>
           <Row>
             <Col xs={4}>
@@ -136,7 +136,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
           </Row>
           <Row>
             <Col xs={4}></Col>
-            <Col xs={8}>{this.renderCard(0)}</Col>
+            <Col xs={8}>{this.renderCard(1)}</Col>
           </Row>
           <Row>
             <Col xs={4}>
@@ -146,7 +146,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
           </Row>
           <Row>
             <Col xs={4}></Col>
-            <Col xs={8}>{this.renderCard(1)}</Col>
+            <Col xs={8}>{this.renderCard(2)}</Col>
           </Row>
           <Row>
             <Col xs={4}>
@@ -156,7 +156,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
           </Row>
           <Row>
             <Col xs={4}></Col>
-            <Col xs={8}>{this.renderCard(2)}</Col>
+            <Col xs={8}>{this.renderCard(3)}</Col>
           </Row>
           <Row>
             <Col xs={4}>
@@ -166,7 +166,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
           </Row>
           <Row>
             <Col xs={4}></Col>
-            <Col xs={8}>{this.renderCard(3)}</Col>
+            <Col xs={8}>{this.renderCard(0)}</Col>
           </Row>
           <Row>
             <Col>{this.renderNumCardsSelect()}</Col>

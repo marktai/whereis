@@ -50,7 +50,7 @@ export default class List extends React.Component<{}, ListState> {
         <ListGroup>
           { gameList }
         </ListGroup>
-        <Button onClick={() => {this.newGame()}} />
+        <Button onClick={() => {this.newGame()}}>New Game</Button>
       </div>
     );
   }

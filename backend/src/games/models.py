@@ -73,7 +73,7 @@ class BoardManager(models.Manager):
                 card_index,
                 random.randint(0, Board.WORDS_PER_CARD),
             )
-            for card_index in random.sample(range(Board.CARDS_IN_ANSWER), k=Board.CARDS_IN_ANSWER)
+            for card_index in random.sample(range(Board.CARDS_GENERATED), k=Board.CARDS_IN_ANSWER)
         ))
         board = self.create(cards=cards, answer=answer, *args, **kwargs)
 
@@ -113,11 +113,12 @@ class Board(models.Model):
     )
 
     suggested_num_cards = models.IntegerField(null=True)
+    author = models.CharField(max_length=50, blank=True)
 
     @property
     def answer_cards(self):
         return tuple((
-            self.cards[card_index][-word_rotation_offset:] + self.cards[card_index][:-word_rotation_offset]
+            self.cards[card_index][word_rotation_offset:] + self.cards[card_index][:word_rotation_offset]
             for (card_index, word_rotation_offset) in self.answer
         ))
 
@@ -133,7 +134,7 @@ class Board(models.Model):
         ))
         answer_cards_set = set(answer_cards)
         non_answer_cards = tuple((
-            x for x in self.cards if tuple(x) not in answer_cards
+            tuple(x) for x in self.cards if tuple(x) not in answer_cards
         ))
 
         num_non_answer_cards = min(
@@ -149,5 +150,38 @@ class Board(models.Model):
             key = lambda x: hash(tuple(x)),
         ))
 
+    @property
+    def answer_from_suggested_cards(self):
+        if self.suggested_num_cards is None:
+            return None
+        return self.answer_from_possible_cards(self.suggested_num_cards)
+
+    def answer_from_possible_cards(self, n):
+        possible_cards = self.possible_cards(n)
+
+        return [
+            [possible_cards.index(tuple(self.cards[ans[0]])), ans[1]]
+            for ans in self.answer
+        ]
+
     def __str__(self):
         return 'board with clues: %s and answer: %s' % (str(self.clues), str(self.answer_cards))
+
+    def check_guess(self, guess_answers, n=None):
+        if n is None:
+            n = self.suggested_num_cards
+        answer = self.answer_from_possible_cards(n)
+
+        resp = []
+        for i in range(len(answer)):
+            cur = None
+            if i >= len(guess_answers):
+                cur = 0
+            elif tuple(answer[i]) == tuple(guess_answers[i]):
+                cur = 1
+            elif answer[i][0] == guess_answers[i][0]:
+                cur = 2
+            else:
+                cur = 0
+            resp.append(cur)
+        return resp
