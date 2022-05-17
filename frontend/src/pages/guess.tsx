@@ -1,9 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
 import CloverService from '../api';
 import { GameType, AnswerType, CardType, GuessResponseType } from '../api';
 
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button, ListGroup } from 'react-bootstrap';
 
 import {
   useParams
@@ -115,7 +114,7 @@ class Game extends React.Component<GameProps, GameState> {
     const init: Array<[number, AnswerType]> = [[0, [0, 0]], [0, [0, 0]], [0, [0, 0]], [0, [0, 0]]];
     return this.state.previousGuesses.reduce( (acc, cur) => {
       return cur[1].map( (r, i) => {
-        if (r != 0 && (acc[i][0] === 0 || r < acc[i][0])) {
+        if (r !== 0 && (acc[i][0] === 0 || r < acc[i][0])) {
           return [r, cur[0][i]];
         } else {
           return acc[i];
@@ -164,16 +163,64 @@ class Game extends React.Component<GameProps, GameState> {
     }
   }
 
-  renderCard(i: number) {
-    if (this.state.guess.cardPositions.length - 1 < i) {
+  getCard(i: number): null|Array<String> {
+    if (this.state.game === null) {
       return null;
     }
-
     const cardPosition = this.state.guess.cardPositions[i];
     const card = rotateArray(
       this.state.game?.suggested_possible_cards?.[cardPosition[0]] as CardType,
       cardPosition[1],
     );
+
+    return card;
+  }
+
+  historyText(): Array<Array<string>> {
+    return this.state.previousGuesses.map(
+      (result, i) =>
+        result[1].map( (x) => {
+          if (x === 1) {
+            return '🟩';
+          } else if (x === 2) {
+            return '🟨';
+          } else {
+            return '⬛';
+          }
+        })
+    );
+  }
+
+  async copyToClipboard() {
+    const text = `${this.state.game?.suggested_num_cards} card clover game\n${this.historyText().map((l) => l.join('')).join('\n')}\nPlay this puzzle at http://clover.marktai.com/games/${this.props.id}/guess`;
+
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      let textArea = document.createElement("textarea");
+      textArea.value = text;
+      // make the textarea out of viewport
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      return new Promise<void>((res, rej) => {
+          // here the magic happens
+          document.execCommand('copy') ? res() : rej();
+          textArea.remove();
+      });
+    }
+  }
+
+  renderCard(i: number) {
+    if (this.state.guess.cardPositions.length - 1 < i) {
+      return null;
+    }
+
+    const card = this.getCard(i);
+
     const positionKnowledge = this.positionKnowledge();
 
     let cardState = 0;
@@ -195,9 +242,9 @@ class Game extends React.Component<GameProps, GameState> {
 
     let cardClasses = ['clover-card'];
 
-    if (cardState == 1) {
+    if (cardState === 1) {
       cardClasses.push('correct-card');
-    } else if (cardState == 2) {
+    } else if (cardState === 2) {
       cardClasses.push('correct-card-incorrect-rotation');
     }
 
@@ -227,6 +274,14 @@ class Game extends React.Component<GameProps, GameState> {
         { this.renderCard(i + 4) }
       </Col>);
     })
+  }
+
+  renderHistory() {
+    const items = this.historyText().map((emojiResults, i) => {
+      return <ListGroup.Item key={i}>{emojiResults.join('')}</ListGroup.Item>;
+    })
+
+    return <ListGroup>{items}</ListGroup>
   }
 
   render() {
@@ -279,12 +334,53 @@ class Game extends React.Component<GameProps, GameState> {
           </Row>
           <Row>
             <Col>
-              <Button onClick={() => {this.submitGuess()}}>Submit Clues </Button>
+              <Button onClick={() => {this.submitGuess()}}>Submit Guess</Button>
             </Col>
           </Row>
           <Row>
             { this.renderLeftoverCards() }
           </Row>
+
+
+          <Row>
+            { this.state.game?.suggested_num_cards } card clover game
+            { this.renderHistory() }
+            <Button onClick={() => {this.copyToClipboard()}}>Copy Score to Clipboard</Button>
+          </Row>
+
+          <div>
+            <h2>Tutorial</h2>
+            Guess what {this.state.game?.author} had as their original card positions!
+            <ListGroup as="ol" numbered>
+              <ListGroup.Item as="li">
+                Each clue relates to the bolded work directly above and below the card. For example, "{this.state.game?.clues?.[0]}" currently relates to "{this.getCard(0)?.[1]}" and "{this.getCard(1)?.[0]}", "{this.state.game?.clues?.[1]}" currently relates to "{this.getCard(1)?.[1]}" and "{this.getCard(2)?.[0]}", etc.
+                <ListGroup variant="flush">
+                  <ListGroup.Item>
+                    The first card is duplicated as the first and fifth card shown. This is for your convenience. For example, "{this.state.game?.clues?.[3]}" currently relates to "{this.getCard(3)?.[1]}" and "{this.getCard(0)?.[0]}".
+                  </ListGroup.Item>
+                </ListGroup>
+              </ListGroup.Item>
+              <ListGroup.Item as="li">
+                Click on one card, then another to swap them
+              </ListGroup.Item>
+              <ListGroup.Item as="li">
+                Click on the rotation buttons to rotate clockwise 🔃 and counterclockwise 🔄
+              </ListGroup.Item>
+              <ListGroup.Item as="li">
+                Press "Submit Guess" to check your guess
+              </ListGroup.Item>
+              <ListGroup.Item as="li">
+                <ListGroup variant="flush">
+                  <ListGroup.Item>
+                    Correct cards will show up with a green border
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    Correctly positioned cards, but incorrectly rotated cards will have a yellow border.
+                  </ListGroup.Item>
+                </ListGroup>
+              </ListGroup.Item>
+            </ListGroup>
+          </div>
         </Container>
       </div>
     );

@@ -1,9 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
 import CloverService from '../api';
 import { GameType } from '../api';
 
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, ListGroup } from 'react-bootstrap';
 
 import {
   useParams
@@ -18,6 +17,7 @@ type CluesState = {
   formData: {
     clues: Array<string>,
     suggestedNumClues: string,
+    author: string,
   },
 };
 
@@ -27,6 +27,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
     formData: {
       clues: ['', '', '', ''],
       suggestedNumClues: '5',
+      author: '',
     },
   };
 
@@ -37,6 +38,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
       formData: {
         clues: game.clues || ['', '', '', ''],
         suggestedNumClues: game.suggested_num_cards?.toString() || '5',
+        author: game.author,
       },
     })
   }
@@ -45,13 +47,15 @@ class Clues extends React.Component<CluesProps, CluesState> {
     const game = await CloverService.submitClues(
       this.props.id,
       this.state.formData.clues,
-      parseInt(this.state.formData.suggestedNumClues)
+      parseInt(this.state.formData.suggestedNumClues),
+      this.state.formData.author,
     );
     this.setState({
       game: game,
       formData: {
         clues: game.clues || ['', '', '', ''],
         suggestedNumClues: game.suggested_num_cards?.toString() || '5',
+        author: game.author,
       },
     })
   }
@@ -91,6 +95,25 @@ class Clues extends React.Component<CluesProps, CluesState> {
           });
         }}
         placeholder={"Clue " + (i+1).toString()}
+      />
+    );
+  }
+
+  renderAuthorInput() {
+    return (
+      <Form.Control
+        type="text"
+        value={this.state.formData.author}
+        onChange={(e) => {
+          this.setState({
+            ...this.state,
+            formData: {
+              ...this.state.formData,
+              author: e.target.value,
+            },
+          });
+        }}
+        placeholder="Your name"
       />
     );
   }
@@ -170,6 +193,7 @@ class Clues extends React.Component<CluesProps, CluesState> {
           </Row>
           <Row>
             <Col>{this.renderNumCardsSelect()}</Col>
+            <Col>{this.renderAuthorInput()}</Col>
             <Col>
               <Button onClick={() => {this.submitClues()}}>{this.state.game?.clues == null ? "Submit Clues" : "Update Clues" }</Button>
             </Col>
@@ -177,11 +201,32 @@ class Clues extends React.Component<CluesProps, CluesState> {
           {
             this.state.game?.clues != null ?
               <Row>
-                <Col>Clues submitted! To guess, go to <a href={`http://clover.marktai.com/games/${this.props.id}/guess`}>http://clover.marktai.com/games/{this.props.id}/guess</a>
+                <Col>Clues submitted at {this.state.game?.last_updated_time}! To guess, go to <a href={`http://clover.marktai.com/games/${this.props.id}/guess`}>http://clover.marktai.com/games/{this.props.id}/guess</a>
                 </Col>
               </Row>
             : null
           }
+
+          <div>
+            <h2>Tutorial</h2>
+            Create clues so that future people playing your puzzle will be able to figure out your original cards after they are all shuffled!
+            <ListGroup as="ol" numbered>
+              <ListGroup.Item as="li">
+                Each clue relates to the bolded work directly above and below the card. For example, "{this.state.formData.clues[0] || "Clue 1"}" relates to "{this.state.game?.answer_cards?.[0]?.[1]}" and "{this.state.game?.answer_cards?.[1]?.[0]}", "{this.state.formData.clues[1] || "Clue 2"}" relates to "{this.state.game?.answer_cards?.[1]?.[1]}" and "{this.state.game?.answer_cards?.[2]?.[0]}", etc.
+                <ListGroup variant="flush">
+                  <ListGroup.Item>
+                    The first card is duplicated as the first and fifth card shown. This is for your convenience. For example, "{this.state.formData.clues[3] || "Clue 4"}" relates to "{this.state.game?.answer_cards?.[3]?.[1]}" and "{this.state.game?.answer_cards?.[0]?.[0]}".
+                  </ListGroup.Item>
+                </ListGroup>
+              </ListGroup.Item>
+              <ListGroup.Item as="li">
+                When you are ready with all of your clues, select how many cards you will use in puzzle. For example, 5 means that one random card will be added, and 8 means that four random cards will be added.
+              </ListGroup.Item>
+              <ListGroup.Item as="li">
+                Add your name, and press "Submit Clues" when you are done!
+              </ListGroup.Item>
+            </ListGroup>
+          </div>
         </Container>
       </div>
     );

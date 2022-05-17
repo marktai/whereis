@@ -7,6 +7,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - database:/var/lib/postgresql/data
+    restart: always
 #   websockets:
 #     image: clover/websockets:latest
 #     build: ./websockets
@@ -21,6 +22,7 @@ services:
       - "7001:80"
     depends_on:
       - db
+    restart: always
 #      - websockets
   frontend:
     image: clover/frontend:latest
@@ -29,6 +31,7 @@ services:
       - ./frontend/src:/app/src
     ports:
       - "7002:3000"
+    restart: always
   nginx:
     image: clover/nginx:latest
     build: ./nginx
@@ -39,6 +42,7 @@ services:
     depends_on:
       - backend
       - frontend
+    restart: always
   #    - websockets
 
 

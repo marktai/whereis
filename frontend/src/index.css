@@ -52,6 +52,7 @@ ol, ul {
 .clover-card {
   border: 1px grey solid;
   border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .clover-card.selected {

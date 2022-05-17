@@ -20,6 +20,7 @@ export type GameType = {
   suggested_possible_cards: null|Array<CardType>,
   created_time: string,
   last_updated_time: string,
+  author: string,
 };
 
 type GameListResponse = {
@@ -116,10 +117,11 @@ export default class CloverService {
     return await post<GameType>(`${this.host}/games`, {});
   }
 
-  public static async submitClues(id: number|string, clues: Array<string>, suggestedNumCards: number): Promise<GameType> {
+  public static async submitClues(id: number|string, clues: Array<string>, suggestedNumCards: number, author: string): Promise<GameType> {
     const body = {
       clues: clues,
       suggested_num_cards: suggestedNumCards,
+      author: author,
     }
 
     return await patch<GameType>(`${this.host}/games/${id}`, body);
