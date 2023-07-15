@@ -1,35 +1,70 @@
 import React from 'react';
 import CloverService from '../api';
 import { GameType } from '../api';
-import ListGroup from 'react-bootstrap/ListGroup';
-import Button from 'react-bootstrap/Button';
+import {Container, Row, Col, ListGroup, Button} from 'react-bootstrap';
 import {
-  Link
+  Link,
+  useNavigate,
+  useParams,
 } from "react-router-dom";
 
+type ListProps = {
+  navigate: any,
+  wordList: string,
+}
+
 type ListState = {
-  games: Array<GameType>;
+  games: null|Array<GameType>,
+  adult: null|boolean,
 };
 
-export default class List extends React.Component<{}, ListState> {
+class List extends React.Component<ListProps, ListState> {
   state: ListState = {
-    games: [],
+    games: null,
+    adult: this.props.wordList === 'adult',
   };
+  ws: null|WebSocket = null;
 
   async refresh() {
-    const games = await CloverService.getGames();
+    const games = await CloverService.getGames(this.props.wordList, this.props.wordList === 'adult');
     this.setState({
+      ...this.state,
       games: games,
     })
   }
 
   async componentDidMount() {
     await this.refresh();
+
+    if (this.ws === null) {
+      const ws_protocol = location.protocol === 'http:' ? 'ws:' : 'wss:';
+      this.ws = new WebSocket(`${ws_protocol}//${window.location.host}/ws/listen/list`);
+      this.ws.onmessage = async (event) => {
+        const message: any = JSON.parse(event.data);
+        if (message.type === 'LIST_UPDATE') {
+          await this.refresh();
+        }
+      }
+    }
+  }
+
+  async componentDidUpdate(prevProps: ListProps) {
+    if (prevProps.wordList !== this.props.wordList) {
+      this.setState({
+        ...this.state,
+        adult: this.props.wordList === 'adult',
+      });
+      await this.refresh();
+    }
   }
 
   async newGame() {
-    await CloverService.newGame();
-    await this.refresh();
+    const newGame = await CloverService.newGame(this.props.wordList);
+    this.props.navigate(`/games/${newGame.id}/clues`);
+  }
+
+  clearAllState() {
+    localStorage.clear();
   }
 
   getLink(game: GameType) {
@@ -37,33 +72,79 @@ export default class List extends React.Component<{}, ListState> {
   }
 
   render() {
-    const gameList = this.state.games.map(
+    const [gamesWithoutClues, gamesWithClues] = [
+      (this.state.games ?? []).filter((g) => g.clues === null),
+      (this.state.games ?? []).filter((g) => g.clues !== null),
+    ].map((list) => list.map(
       (game: GameType, i: number) => {
-        const text = game.clues === null ?
+        let text = game.clues === null ?
           `Game ${game.id} without clues` :
           `Game ${game.id} by ${game.author} with ${game.suggested_num_cards} cards`;
+        if (game.daily_set_time !== null) {
+          const date = new Date(new Date(game.daily_set_time).toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+          text += ` (${date.getMonth() + 1}/${date.getDate()}'s daily puzzle)`
+        }
         return <ListGroup.Item key={i}>
           <Link to={this.getLink(game)}>{text}</Link>
         </ListGroup.Item>;
-    });
+    }));
 
     return (
-      <div className="list">
-        <ListGroup>
-          { gameList }
-        </ListGroup>
-        <Button onClick={() => {this.newGame()}}>New Game</Button>
-        <div>
-          <ListGroup variant="flush">
-            <ListGroup.Item>
-              To give clues for a new game, click "New Game", then click on the newly generated "Game # without clues" on the top
-            </ListGroup.Item>
-            <ListGroup.Item>
-              To solve the clues for an existing game, click on a game that says "Game # by author with 5-8 cards"
-            </ListGroup.Item>
-          </ListGroup>
-        </div>
-      </div>
+      <Container className={"list" + (this.props.wordList !== "default" ? ` ${this.props.wordList}` : "")}>
+        <Row>
+          <Col xs={12} md={6}>
+            <Button onClick={() => {this.newGame()}}>New {this.props.wordList !== "default" ? ` ${this.props.wordList}` : ""} Game</Button>
+            <div>
+              Games with clues, ready to guess
+            </div>
+            <ListGroup>
+              <ListGroup.Item key={"daily"}>
+                <Link to={"/daily"}>Daily updated game</Link>
+              </ListGroup.Item>
+              {
+                this.state.games === null ?
+                  <img className="loader" src="https://www.marktai.com/download/54689/ZZ5H.gif"/> :
+                  gamesWithClues
+              }
+            </ListGroup>
+            {/*Games without clues
+            <ListGroup>
+              { gamesWithoutClues }
+            </ListGroup>*/}
+          </Col>
+          <Col xs={12} md={6}>
+            <ListGroup variant="flush">
+              <ListGroup.Item>
+                To give clues for a new game, click "New Game"
+              </ListGroup.Item>
+              <ListGroup.Item>
+                To solve the clues for an existing game, click on any listed game
+              </ListGroup.Item>
+            </ListGroup>
+            <div>
+              If you are having any issues with loading only some puzzles or some puzzles have the wrong information, click this button.
+              <div>
+                <Button variant={"danger"} onClick={() => {this.clearAllState()}}>Clear all local state!</Button>
+              </div>
+            </div>
+            <div>
+            If you have any questions or feedback, feel free to email me at mark@marktai.com!
+            </div>
+          </Col>
+        </Row>
+      </Container>
     );
   }
 }
+
+type ListContainerProps = {
+  wordList?: string,
+}
+
+const ListContainer: React.FunctionComponent<ListContainerProps> = (props) => {
+  const navigate = useNavigate();
+  const wordList = props.wordList || useParams().wordList as string || "default";
+  return (<List navigate={navigate} wordList={wordList }></List>)
+}
+
+export default ListContainer;

@@ -17,9 +17,22 @@ from . import models
 @admin.register(models.Board)
 class BoardAdmin(admin.ModelAdmin):
     pass
+
+@admin.register(models.BoardClientState)
+class BoardClientStateAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(models.BoardGuess)
+class BoardGuessAdmin(admin.ModelAdmin):
+    pass
     # fields = ('fen', 'turn_count', 'game_link', 'created_time', 'last_updated_time')
     # readonly_fields = ('game_link', 'created_time', 'last_updated_time')
 
     # def game_link(self, obj):
     #     url = '../../../game/%d/change' % obj.game.id
     #     return mark_safe('<a href="%s">%s</a>' % (url, obj.game))
+
+
+@admin.register(models.WordList)
+class WordListAdmin(admin.ModelAdmin):
+    pass
