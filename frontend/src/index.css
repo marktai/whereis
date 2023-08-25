@@ -84,18 +84,25 @@ ol, ul {
   animation-duration: 0.5s;
 }
 
+.clover-card.card-0 {
+  border-style: dashed;
+}
+
 .clover-card.selected {
   box-shadow: 0 0 0 0.2rem blue
 }
 
+/*
 .clover-card.duplicated {
   color: #707070;
   border-color: #D0D0D0;
 }
+*/
 
 .clover-card.correct-card,
 .clover-card.correct-card.duplicated {
-  border: 2px #00FF00 solid;
+  border-size: 2px;
+  border-color: #00FF00;
 }
 
 .correct-card-text {
@@ -104,7 +111,8 @@ ol, ul {
 
 .clover-card.correct-position,
 .clover-card.correct-position.duplicated {
-  border: 2px #f5ed00 solid;
+  border-size: 2px;
+  border-color: #f5ed00;
 }
 
 .correct-position-text {
@@ -113,7 +121,8 @@ ol, ul {
 
 .clover-card.correct-position-incorrect-rotation,
 .clover-card.correct-position-incorrect-rotation.duplicated {
-  border: 2px #FF9933 solid;
+  border-size: 2px;
+  border-color: #FF9933;
 }
 
 .correct-position-incorrect-rotation-text {
@@ -122,7 +131,8 @@ ol, ul {
 
 .clover-card.incorrect-card,
 .clover-card.incorrect-card.duplicated {
-  border: 2px #B80000 solid;
+  border-size: 2px;
+  border-color: #B80000;
 }
 
 .incorrect-card-text {
