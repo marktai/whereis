@@ -523,25 +523,25 @@ export class Guess extends React.Component<GuessProps, GuessState> {
           </Row>
           <Row>
             <Col className="clue" xs={3}>
-              <div>{this.state.game?.clues?.[0]}</div>
+              <span>{this.state.game?.clues?.[0]}</span>
             </Col>
             <Col xs={9}>{this.renderCard(1, false, false)}</Col>
           </Row>
           <Row>
             <Col className="clue" xs={3}>
-              <div>{this.state.game?.clues?.[1]}</div>
+              <span>{this.state.game?.clues?.[1]}</span>
             </Col>
             <Col xs={9}>{this.renderCard(2, false, false)}</Col>
           </Row>
           <Row>
             <Col className="clue" xs={3}>
-              <div>{this.state.game?.clues?.[2]}</div>
+              <span>{this.state.game?.clues?.[2]}</span>
             </Col>
             <Col xs={9}>{this.renderCard(3, false, false)}</Col>
           </Row>
           <Row>
             <Col className="clue" xs={3}>
-              <div>{this.state.game?.clues?.[3]}</div>
+              <span>{this.state.game?.clues?.[3]}</span>
             </Col>
             <Col xs={9}>{this.renderCard(0, true, false)}</Col>
           </Row>
