@@ -250,29 +250,25 @@ input.clue {
   text-align: right;
   position: absolute;
   transform: translateY(-50%);
+  right: -12px;
   border-color: grey;
   border-radius: 4px 0 0px 4px;
   border-right: 0;
+  padding-right: 12px;
   padding-left: 8px;
-  z-index: -1;
 }
 
 .clue input {
   padding-top: 13px;
   padding-bottom: 14px;
-  right: -22px;
-  padding-right: 22px;
 }
 
 .clue div, .clue span {
   border-width: 2px;
   border-style: solid;
   border-right: 0;
-  padding-top: 11px;
-  padding-bottom: 11px;
-  margin-top: -1px;
-  right: -20px;
-  padding-right: 20px;
+  padding-top: 12px;
+  padding-bottom: 10px;
 }
 
 .clue input:active, 
