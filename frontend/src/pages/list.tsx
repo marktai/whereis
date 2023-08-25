@@ -37,7 +37,7 @@ class List extends React.Component<ListProps, ListState> {
     await this.refresh();
 
     if (this.ws === null) {
-      const ws_protocol = location.protocol === 'http:' ? 'ws:' : 'wss:';
+      const ws_protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:';
       this.ws = new WebSocket(`${ws_protocol}//${window.location.host}/ws/listen/list`);
       this.ws.onmessage = async (event) => {
         const message: any = JSON.parse(event.data);
@@ -143,7 +143,8 @@ type ListContainerProps = {
 
 const ListContainer: React.FunctionComponent<ListContainerProps> = (props) => {
   const navigate = useNavigate();
-  const wordList = props.wordList || useParams().wordList as string || "default";
+  const urlWordList = useParams().wordList as string;
+  const wordList = props.wordList || urlWordList || "default";
   return (<List navigate={navigate} wordList={wordList }></List>)
 }
 

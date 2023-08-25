@@ -29,6 +29,7 @@ services:
     build: ./frontend
     volumes:
       - ./frontend/src:/app/src
+      - ./frontend/build:/app/build
     ports:
       - "7003:3000"
     restart: always

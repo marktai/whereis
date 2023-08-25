@@ -185,7 +185,7 @@ export class Guess extends React.Component<GuessProps, GuessState> {
     }
 
     if (this.ws === null) {
-      const ws_protocol = location.protocol === 'http:' ? 'ws:' : 'wss:';
+      const ws_protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:';
       this.ws = new WebSocket(`${ws_protocol}//${window.location.host}/ws/listen/${this.props.id}`);
       this.ws.onmessage = (event) => {
         const message: any = JSON.parse(event.data);
