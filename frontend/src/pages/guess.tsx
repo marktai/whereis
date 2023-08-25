@@ -451,9 +451,8 @@ export class Guess extends React.Component<GuessProps, GuessState> {
       </div>
     </Col>
 
-
     return (
-      <Container className="card-container" fluid>
+      <Container key={i.toString() + ": " + duplicated.toString()} className="card-container" fluid>
         <Row>
           <Col xs={buttonsInside ? 12 : 10} xl={buttonsInside ? 12 : 9}>
             <div className={cardClasses.join(' ')} onClick={(e) => this.handleCardClick(i, e)}>
