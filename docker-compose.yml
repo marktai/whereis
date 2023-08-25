@@ -39,6 +39,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./frontend/static:/frontend/static
+      - ./frontend/build:/frontend/build
     depends_on:
       - backend
 #      - frontend
