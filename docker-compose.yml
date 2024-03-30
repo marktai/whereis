@@ -13,6 +13,7 @@ services:
     build: ./websockets
     ports:
       - "7002:80"
+    restart: always
   backend:
     image: clover/backend:latest
     build: ./backend
