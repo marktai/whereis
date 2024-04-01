@@ -39,6 +39,9 @@ class AddLocationView(APIView):
 
 class LaYesterdayMedianLocationView(APIView):
     def get(self, request, *args, **kwargs):
-        daily = Location.objects.la_yesterday_median_location()
+        yesterday = Location.objects.la_yesterday_median_location()
 
-        return Response(LocationSerializer(daily).data)
+        if yesterday is None:
+            raise Http404("No data found")
+
+        return Response(LocationSerializer(yesterday).data)
